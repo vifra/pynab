@@ -169,8 +169,7 @@
               {% for segment in row.segments %}
               {% if segment.kind == "points" %}
                 {% for point in segment.points %}
-                <span class="planner-point {{ segment.class }} planner-edit-trigger" data-rule-id="{{ segment.rule_id }}" style="left: {{ point.left }}%; background-color: {{ segment.color }};" title="{{ segment.label }} - {{ point.time }}"></span>
-                <span class="planner-point-label planner-edit-trigger" data-rule-id="{{ segment.rule_id }}" style="left: {{ point.left }}%;">{{ point.time }}</span>
+                <span class="planner-point {{ segment.class }} planner-edit-trigger" data-rule-id="{{ segment.rule_id }}" style="left: {{ point.left }}%; background-color: {{ segment.color }};" title="{{ segment.service_name }} - {{ point.time }}"></span>
                 {% endfor %}
               {% else %}
               <div class="planner-segment {{ segment.class }} planner-edit-trigger" data-rule-id="{{ segment.rule_id }}" style="left: {{ segment.left }}%; width: {{ segment.width }}%; background-color: {{ segment.color }}; color: {{ segment.text_color }}; --lane: {{ segment.lane }};" title="{{ segment.label }}">
@@ -238,6 +237,8 @@ $(function() {
     form.find("input[name='start_time'], input[name='end_time']").prop("required", mode == "window");
     form.find("input[name='trigger_times']").prop("required", mode == "times");
     form.find("input[name='interval_minutes']").prop("required", mode == "interval");
+    form.find("input[name='interval_start_time']").prop("required", mode == "interval");
+    form.find("input[name='interval_end_time']").prop("required", mode == "interval");
   }
   function formColorInput(form) {
     return form.find("input[name='color']");

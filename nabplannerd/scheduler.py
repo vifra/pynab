@@ -3,6 +3,7 @@ import logging
 from typing import Iterable, Optional
 
 from asgiref.sync import sync_to_async
+from dateutil import tz
 
 from .models import ScheduledRule
 
@@ -41,9 +42,21 @@ def available_actions():
     return ACTION_CHOICES
 
 
+def local_now():
+    return datetime.datetime.now(tz=tz.gettz(get_system_tz()))
+
+
+def get_system_tz():
+    try:
+        with open("/etc/timezone") as timezone_file:
+            return timezone_file.read().strip()
+    except OSError:
+        return None
+
+
 async def run_due_rules(now: Optional[datetime.datetime] = None):
     if now is None:
-        now = datetime.datetime.now().astimezone()
+        now = local_now()
     rules = await sync_to_async(list, thread_sensitive=True)(
         ScheduledRule.objects.filter(enabled=True)
     )
@@ -67,8 +80,6 @@ def due_trigger_key(rule: ScheduledRule, now: datetime.datetime):
     if not is_active_weekday(rule, now.weekday()):
         return None
     current_time = now.time().replace(second=0, microsecond=0)
-    if not is_in_window(current_time, rule.start_time, rule.end_time):
-        return None
     if rule.mode == ScheduledRule.MODE_WINDOW or rule.action == "active_window":
         return None
     if rule.mode == ScheduledRule.MODE_INTERVAL:

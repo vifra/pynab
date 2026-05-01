@@ -31,6 +31,7 @@ WEEKDAYS = [
 TIMELINE_START_HOUR = 0
 TIMELINE_END_HOUR = 23
 TIMELINE_HOURS = 24
+MAX_INTERVAL_POINTS = 48
 
 
 class PlannerView(View):
@@ -115,8 +116,12 @@ def apply_rule_form(rule, post):
         rule.trigger_times = []
         rule.interval_minutes = None
     elif rule.mode == ScheduledRule.MODE_INTERVAL:
-        rule.start_time = None
-        rule.end_time = None
+        rule.start_time = parse_time(
+            post.get("interval_start_time", "") or post.get("start_time", "")
+        )
+        rule.end_time = parse_time(
+            post.get("interval_end_time", "") or post.get("end_time", "")
+        )
         rule.trigger_times = []
         rule.interval_minutes = parse_int(post.get("interval_minutes", ""))
     else:
@@ -253,7 +258,7 @@ def timeline_segment(rule):
         return timeline_window(rule)
     if rule.mode == ScheduledRule.MODE_TIMES:
         return timeline_points(rule)
-    return timeline_window(rule)
+    return timeline_interval(rule)
 
 
 def timeline_window(rule):
@@ -309,10 +314,58 @@ def timeline_points(rule):
         "kind": "points",
         "rule_id": rule.id,
         "label": display_rule(rule),
+        "service_name": rule.name,
         "class": service_class(rule.service, rule.enabled),
         "color": rule_color(rule),
         "points": points,
     }
+
+
+def timeline_interval(rule):
+    points = interval_points(rule)
+    if points and len(points) <= MAX_INTERVAL_POINTS:
+        return {
+            "kind": "points",
+            "rule_id": rule.id,
+            "label": display_rule(rule),
+            "service_name": rule.name,
+            "class": service_class(rule.service, rule.enabled),
+            "color": rule_color(rule),
+            "points": points,
+        }
+    return timeline_window(rule)
+
+
+def interval_points(rule):
+    if not rule.interval_minutes or rule.interval_minutes <= 0 or not rule.start_time:
+        return []
+    start_minutes = minutes_since_midnight(rule.start_time)
+    end_minutes = (
+        minutes_since_midnight(rule.end_time)
+        if rule.end_time
+        else 24 * 60 - 1
+    )
+    if end_minutes < start_minutes:
+        end_minutes = 24 * 60 - 1
+
+    visible_start = TIMELINE_START_HOUR * 60
+    visible_end = TIMELINE_HOURS * 60
+    minute = max(start_minutes, visible_start)
+    if minute > start_minutes:
+        offset = (minute - start_minutes) % rule.interval_minutes
+        if offset:
+            minute += rule.interval_minutes - offset
+
+    points = []
+    while minute <= end_minutes and minute < visible_end:
+        points.append(
+            {
+                "left": f"{((minute - visible_start) / (visible_end - visible_start)) * 100:.3f}",
+                "time": f"{minute // 60:02d}:{minute % 60:02d}",
+            }
+        )
+        minute += rule.interval_minutes
+    return points
 
 
 def timeline_markers(rule, start_minutes, end_minutes, total):
@@ -345,6 +398,10 @@ def display_rule(rule):
         return rule.name
     elif rule.mode == ScheduledRule.MODE_INTERVAL:
         cadence = f"toutes les {rule.interval_minutes} min"
+        if rule.start_time:
+            cadence = f"{cadence} a partir de {rule.start_time.strftime('%H:%M')}"
+        if rule.end_time:
+            cadence = f"{cadence} jusqu'a {rule.end_time.strftime('%H:%M')}"
     else:
         cadence = ", ".join(rule.trigger_times or [])
     return f"{rule.name} - {cadence}"

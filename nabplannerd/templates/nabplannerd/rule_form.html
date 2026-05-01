@@ -61,9 +61,19 @@
     <label>{% trans "Heures de declenchement" %}</label>
     <input name="trigger_times" type="text" class="form-control" value="{% if rule %}{{ rule.trigger_times|join:', ' }}{% endif %}" placeholder="10:30, 14:00, 19:59">
   </div>
-  <div class="form-group interval-fields">
-    <label>{% trans "Toutes les N minutes" %}</label>
-    <input name="interval_minutes" type="number" min="1" class="form-control" value="{% if rule and rule.interval_minutes %}{{ rule.interval_minutes }}{% endif %}" placeholder="60">
+  <div class="form-row interval-fields">
+    <div class="form-group col-md-4">
+      <label>{% trans "Toutes les N minutes" %}</label>
+      <input name="interval_minutes" type="number" min="1" class="form-control" value="{% if rule and rule.interval_minutes %}{{ rule.interval_minutes }}{% endif %}" placeholder="60">
+    </div>
+    <div class="form-group col-md-4">
+      <label>{% trans "A partir de" %}</label>
+      <input name="interval_start_time" type="time" class="form-control" value="{% if rule and rule.mode == "interval" and rule.start_time %}{{ rule.start_time|time:'H:i' }}{% endif %}">
+    </div>
+    <div class="form-group col-md-4">
+      <label>{% trans "Jusqu'a" %}</label>
+      <input name="interval_end_time" type="time" class="form-control" value="{% if rule and rule.mode == "interval" and rule.end_time %}{{ rule.end_time|time:'H:i' }}{% endif %}">
+    </div>
   </div>
   <div class="form-check mb-3">
     <input name="enabled" type="checkbox" class="form-check-input" id="enabled-{{ rule.id|default:'new' }}"{% if not rule or rule.enabled %} checked{% endif %}>

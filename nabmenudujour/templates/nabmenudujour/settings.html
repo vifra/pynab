@@ -11,13 +11,7 @@
         <label for="menuDuJourJsonUrl" class="col-6 col-form-label">{% trans "JSON URL" %}</label>
         <div class="col-6">
           <input id="menuDuJourJsonUrl" name="json_url" type="url" class="form-control" value="{{ config.json_url }}" placeholder="https://example.com/menu.json">
-        </div>
-      </div>
-      <div class="form-group row">
-        <label class="col-6 col-form-label">{% trans "Meal" %}</label>
-        <div class="col-6">
           <button type="button" class="btn btn-primary now-button">{% trans "Read now" %}</button>
-          <button type="button" class="btn btn-outline-primary preview-button">{% trans "Preview" %}</button>
         </div>
       </div>
       <div class="menu-preview small text-muted"></div>
