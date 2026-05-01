@@ -1,0 +1,12 @@
+[Unit]
+Description=Pynab menu du jour service
+After=nabd.service
+
+[Service]
+WorkingDirectory=/opt/pynab
+ExecStart=/opt/pynab/env/bin/python -m nabmenudujour.nabmenudujour
+Restart=always
+User=pynab
+
+[Install]
+WantedBy=multi-user.target

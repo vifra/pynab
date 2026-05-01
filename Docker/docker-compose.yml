@@ -26,7 +26,7 @@ services:
         depends_on:
           - db
         environment:
-          - DAEMONS=nab8balld nabairqualityd nabbookd nabclockd nabmastodond nabsurprised nabtaichid nabweatherd
+          - DAEMONS=nab8balld nabairqualityd nabbookd nabclockd nabmastodond nabsurprised nabtaichid nabweatherd nabmenudujour
           - TZ=Europe/Paris
         command: ["/bin/bash", "/usr/local/bin/run-pynab.sh"]
         ports:

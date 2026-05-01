@@ -1,4 +1,7 @@
 /* help links */
+body {
+  background-color: darkorchid;
+}
 a.help-link {
   color: inherit;
   text-decoration: inherit;

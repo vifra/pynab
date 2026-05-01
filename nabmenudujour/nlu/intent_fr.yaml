@@ -1,0 +1,10 @@
+---
+type: intent
+name: nabmenudujour/menu
+utterances:
+  - menu du jour
+  - donne-moi le menu du jour
+  - dis-moi le menu du jour
+  - qu'est-ce qu'on mange aujourd'hui
+  - quel est le repas du jour
+  - c'est quoi le repas du jour

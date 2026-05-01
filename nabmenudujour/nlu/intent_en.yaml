@@ -1,0 +1,8 @@
+---
+type: intent
+name: nabmenudujour/menu
+utterances:
+  - menu of the day
+  - tell me today's meal
+  - what is today's meal
+  - what are we eating today
