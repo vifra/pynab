@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     "nabweatherd",
     "nabairqualityd",
     "nabmenudujour",
+    "nabplannerd",
     "nabweb",
     "nabiftttd",
     "nabradio",

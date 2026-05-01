@@ -1,0 +1,73 @@
+{% load i18n %}
+<form id="planner-form-{% if rule %}{{ rule.id }}{% else %}new{% endif %}" action="{% url 'nabplanner.index' %}" method="post" class="planner-rule">
+  {% csrf_token %}
+  <input name="color" type="hidden" class="planner-color-value" value="{% if rule %}{{ rule.display_color }}{% else %}#27865a{% endif %}">
+  {% if rule %}<input type="hidden" name="rule_id" value="{{ rule.id }}">{% endif %}
+  <div class="form-row">
+    <div class="form-group col-md-6">
+      <label>{% trans "Service" %}</label>
+      <select name="service" class="form-control" required>
+        <option value=""{% if not rule %} selected{% endif %} disabled>{% trans "Choisir un service" %}</option>
+        {% for service_id, service_name in services %}
+        <option value="{{ service_id }}"{% if rule and rule.service == service_id %} selected{% endif %}>{{ service_name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="form-group col-md-6 planner-action-field">
+      <label>{% trans "Action" %}</label>
+      <select name="action" class="form-control">
+        <option value="today"{% if not rule or rule.action == "today" %} selected{% endif %}>{% trans "Aujourd'hui / defaut" %}</option>
+        <option value="tomorrow"{% if rule and rule.action == "tomorrow" %} selected{% endif %}>{% trans "Demain" %}</option>
+        <option value="active_window"{% if rule and rule.action == "active_window" %} selected{% endif %}>{% trans "Plage active" %}</option>
+      </select>
+    </div>
+  </div>
+  <div class="form-group planner-mode-field">
+    <label>{% trans "Type" %}</label>
+    <select name="mode" class="form-control" required>
+      <option value=""{% if not rule %} selected{% endif %} disabled>{% trans "Choisir un type" %}</option>
+      <option value="times"{% if rule and rule.mode == "times" %} selected{% endif %}>{% trans "Heures fixes" %}</option>
+      <option value="interval"{% if rule and rule.mode == "interval" %} selected{% endif %}>{% trans "Recurrence" %}</option>
+      <option value="window"{% if rule and rule.mode == "window" %} selected{% endif %}>{% trans "Plage d'activite" %}</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label>{% trans "Jours actifs" %}</label>
+    <div class="mb-2">
+      <button type="button" class="btn btn-sm btn-outline-secondary planner-weekdays-preset" data-days="0,1,2,3,4">{% trans "Semaine" %}</button>
+      <button type="button" class="btn btn-sm btn-outline-secondary planner-weekdays-preset" data-days="5,6">{% trans "Week-end" %}</button>
+      <button type="button" class="btn btn-sm btn-outline-secondary planner-weekdays-preset" data-days="0,1,2,3,4,5,6">{% trans "Tous" %}</button>
+    </div>
+    <div class="planner-weekdays">
+      {% for weekday_value, weekday_label in weekdays %}
+      <div class="form-check form-check-inline">
+        <input name="weekdays" type="checkbox" class="form-check-input" id="weekday-{{ rule.id|default:'new' }}-{{ weekday_value }}" value="{{ weekday_value }}"{% if not rule or weekday_value in rule.weekday_set %} checked{% endif %}>
+        <label class="form-check-label" for="weekday-{{ rule.id|default:'new' }}-{{ weekday_value }}">{{ weekday_label }}</label>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="form-row window-fields">
+    <div class="form-group col-md-6">
+      <label>{% trans "Debut de plage" %}</label>
+      <input name="start_time" type="time" class="form-control" value="{% if rule and rule.start_time %}{{ rule.start_time|time:'H:i' }}{% endif %}">
+    </div>
+    <div class="form-group col-md-6">
+      <label>{% trans "Fin de plage" %}</label>
+      <input name="end_time" type="time" class="form-control" value="{% if rule and rule.end_time %}{{ rule.end_time|time:'H:i' }}{% endif %}">
+    </div>
+  </div>
+  <div class="form-group times-fields">
+    <label>{% trans "Heures de declenchement" %}</label>
+    <input name="trigger_times" type="text" class="form-control" value="{% if rule %}{{ rule.trigger_times|join:', ' }}{% endif %}" placeholder="10:30, 14:00, 19:59">
+  </div>
+  <div class="form-group interval-fields">
+    <label>{% trans "Toutes les N minutes" %}</label>
+    <input name="interval_minutes" type="number" min="1" class="form-control" value="{% if rule and rule.interval_minutes %}{{ rule.interval_minutes }}{% endif %}" placeholder="60">
+  </div>
+  <div class="form-check mb-3">
+    <input name="enabled" type="checkbox" class="form-check-input" id="enabled-{{ rule.id|default:'new' }}"{% if not rule or rule.enabled %} checked{% endif %}>
+    <label class="form-check-label" for="enabled-{{ rule.id|default:'new' }}">{% trans "Active" %}</label>
+  </div>
+  <button type="submit" class="btn btn-primary">{% trans "Enregistrer" %}</button>
+</form>

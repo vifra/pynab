@@ -1,0 +1,12 @@
+[Unit]
+Description=Pynab planner service
+After=nabd.service
+
+[Service]
+WorkingDirectory=/opt/pynab
+ExecStart=/opt/pynab/venv/bin/python -m nabplannerd.nabplannerd
+Restart=always
+User=root
+
+[Install]
+WantedBy=multi-user.target
