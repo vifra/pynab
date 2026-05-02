@@ -13,6 +13,7 @@ TRIGGER_GRACE_MINUTES = 2
 SERVICE_CHOICES = [
     ("nabweatherd", "Meteo"),
     ("nabmenudujour", "Menu du jour"),
+    ("nabtts", "Text to speech"),
     ("nabtaichid", "Tai Chi"),
     ("nabsurprised", "Humeurs"),
 ]
@@ -24,6 +25,9 @@ ACTION_CHOICES = {
     ],
     "nabmenudujour": [
         ("today", "Menu du jour"),
+    ],
+    "nabtts": [
+        ("message", "Message"),
     ],
     "nabtaichid": [
         ("active_window", "Plage active"),
@@ -190,6 +194,17 @@ async def trigger_service(service, action):
         config.next_performance_type = action or "today"
         await config.save_async()
         NabMenuDuJour.signal_daemon()
+    elif service == "nabtts":
+        from nabtts.models import Config
+        from nabtts.nabtts import NabTTS
+
+        config = await Config.load_async()
+        config.next_performance_date = datetime.datetime.now(
+            datetime.timezone.utc
+        )
+        config.next_performance_text = action or ""
+        await config.save_async()
+        NabTTS.signal_daemon()
     elif service == "nabtaichid":
         from nabtaichid.nabtaichid import NabTaichid
 

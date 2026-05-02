@@ -1,0 +1,54 @@
+{% load i18n %}
+{% trans "When Nabaztag sees that NFC tag, it will say this message." %}
+<p>
+<div class="form-group">
+  <label for="tts_text">{% trans "Message:" %}</label>
+  <textarea id="tts_text" name="tts_text" class="form-control" rows="4" maxlength="1000">{{ tts_text }}</textarea>
+  <input id="tts_uid" name="tts_uid" type="hidden" value="{{ tts_uid }}">
+</div>
+<div class="form-row">
+  <div class="form-group col-md-4">
+    <label for="tts_provider">{% trans "Moteur:" %}</label>
+    <select id="tts_provider" name="tts_provider" class="form-control">
+      {% for provider_value, provider_label in provider_choices %}
+      <option value="{{ provider_value }}"{% if tts_provider == provider_value %} selected{% endif %}>{{ provider_label }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="form-group col-md-4">
+    <label for="tts_voice">{% trans "Voice:" %}</label>
+    <select id="tts_voice" name="tts_voice" class="form-control">
+      {% for voice_value, voice_label in voice_choices %}
+      <option value="{{ voice_value }}"{% if tts_voice == voice_value %} selected{% endif %}{% if voice_value in edge_voice_values %} data-provider="edge"{% else %} data-provider="google"{% endif %}>{{ voice_label }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="form-group col-md-4">
+    <label for="tts_style">{% trans "Intonation:" %}</label>
+    <select id="tts_style" name="tts_style" class="form-control">
+      {% for style_value, style_label in style_choices %}
+      <option value="{{ style_value }}"{% if tts_style == style_value %} selected{% endif %}>{{ style_label }}</option>
+      {% endfor %}
+    </select>
+  </div>
+</div>
+<script type="text/javascript">
+$(function() {
+  var providerSelect = $("#tts_provider");
+  var voiceSelect = $("#tts_voice");
+  function syncVoiceOptions() {
+    var provider = providerSelect.val();
+    var selected = voiceSelect.val();
+    voiceSelect.find("option").each(function() {
+      $(this).toggleClass("d-none", $(this).data("provider") != provider);
+    });
+    if (voiceSelect.find("option:selected").data("provider") != provider) {
+      voiceSelect.val(voiceSelect.find("option[data-provider='" + provider + "']").first().val());
+    } else {
+      voiceSelect.val(selected);
+    }
+  }
+  syncVoiceOptions();
+  providerSelect.on("change", syncVoiceOptions);
+});
+</script>

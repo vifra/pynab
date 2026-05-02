@@ -16,6 +16,14 @@ from .scheduler import (
     parse_times,
     trigger_service,
 )
+from nabtts import rfid_data as tts_rfid_data
+from nabtts.tts import (
+    EDGE_VOICE_CHOICES,
+    GOOGLE_VOICE_CHOICES,
+    PROVIDER_CHOICES,
+    STYLE_CHOICES,
+    VOICE_CHOICES,
+)
 
 
 WEEKDAYS = [
@@ -62,6 +70,13 @@ class PlannerView(View):
             "rules": rules,
             "services": available_services(),
             "actions": available_actions(),
+            "provider_choices": PROVIDER_CHOICES,
+            "voice_choices": VOICE_CHOICES,
+            "edge_voice_values": [value for value, label in EDGE_VOICE_CHOICES],
+            "google_voice_values": [
+                value for value, label in GOOGLE_VOICE_CHOICES
+            ],
+            "style_choices": STYLE_CHOICES,
             "weekdays": WEEKDAYS,
             "timeline_hours": timeline_hours(),
             "timeline": build_timeline(rules, sleep_segments),
@@ -102,6 +117,13 @@ def apply_rule_form(rule, post):
     rule.service = post.get("service", "")
     rule.action = post.get("action", "")
     rule.name = service_name(rule.service)
+    if rule.service == "nabtts":
+        rule.action = tts_rfid_data.serialize_payload(
+            post.get("tts_message", ""),
+            post.get("tts_voice", ""),
+            post.get("tts_style", ""),
+            post.get("tts_provider", ""),
+        )
     if rule.service in ("nabtaichid", "nabsurprised"):
         rule.action = "active_window"
     rule.color = normalize_color(post.get("color", ""))
@@ -192,6 +214,12 @@ def decorate_rules(rules):
         rule.timeline_label = display_rule(rule)
         rule.display_color = rule_color(rule)
         rule.display_text_color = contrast_text_color(rule.display_color)
+        if rule.service == "nabtts":
+            payload = tts_rfid_data.unserialize_payload(rule.action)
+            rule.tts_message = payload["text"]
+            rule.tts_provider = payload["provider"]
+            rule.tts_voice = payload["voice"]
+            rule.tts_style = payload["style"]
 
 
 def build_timeline(rules, sleep_segments):
@@ -394,6 +422,14 @@ def marker_position(minute, start_minutes, end_minutes):
 
 
 def display_rule(rule):
+    if rule.service == "nabtts":
+        payload = tts_rfid_data.unserialize_payload(rule.action)
+        message = payload["text"]
+        if len(message) > 28:
+            message = message[:28].strip() + "..."
+        if not message:
+            message = "Message"
+        return f"{rule.name} - {message}"
     if is_window_rule(rule):
         return rule.name
     elif rule.mode == ScheduledRule.MODE_INTERVAL:
@@ -422,6 +458,8 @@ def service_class(service, enabled):
         return "planner-service-weather"
     if service == "nabmenudujour":
         return "planner-service-menu"
+    if service == "nabtts":
+        return "planner-service-tts"
     if service == "nabtaichid":
         return "planner-service-taichi"
     if service == "nabsurprised":
@@ -449,6 +487,8 @@ def rule_color(rule):
         return "#2077b4"
     if rule.service == "nabmenudujour":
         return "#27865a"
+    if rule.service == "nabtts":
+        return "#5b6c8f"
     if rule.service == "nabtaichid":
         return "#b45f06"
     if rule.service == "nabsurprised":

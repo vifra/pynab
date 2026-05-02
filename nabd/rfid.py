@@ -11,6 +11,7 @@ import nabmenudujour
 import nabradio
 import nabsound
 import nabsurprised
+import nabtts
 import nabtaichid
 import nabweatherd
 import nabwebhook
@@ -55,6 +56,7 @@ TAG_APPLICATIONS = {
     nabwebhook.NABAZTAG_RFID_APPLICATION_ID: "nabwebhook",  # 13
     nabmenudujour.NABAZTAG_RFID_APPLICATION_ID: "nabmenudujour",  # 14
     nabsound.NABAZTAG_RFID_APPLICATION_ID: "nabsound",  # 15
+    nabtts.NABAZTAG_RFID_APPLICATION_ID: "nabtts",  # 16
 }
 
 DEFAULT_RFID_TIMEOUT = 20.0

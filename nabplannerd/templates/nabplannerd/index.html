@@ -129,6 +129,9 @@
   .planner-service-menu {
     background: #27865a;
   }
+  .planner-service-tts {
+    background: #5b6c8f;
+  }
   .planner-service-taichi {
     background: #b45f06;
   }
@@ -255,7 +258,11 @@ $(function() {
     var action = form.find("select[name='action']");
     var mode = form.find("select[name='mode']");
     var color = formColorPicker(form);
+    var ttsProvider = form.find("select[name='tts_provider']");
+    var ttsVoice = form.find("select[name='tts_voice']");
     form.find(".planner-action-field").toggleClass("d-none", service != "nabweatherd");
+    form.find(".planner-tts-field").toggleClass("d-none", service != "nabtts");
+    syncTtsVoiceOptions(form);
     var nativeWindowService = service == "nabtaichid" || service == "nabsurprised";
     form.find(".planner-mode-field").toggleClass("d-none", nativeWindowService);
     if (nativeWindowService) {
@@ -278,6 +285,31 @@ $(function() {
       if (!color.data("touched")) {
         setFormColor(form, "#27865a");
       }
+    } else if (service == "nabtts") {
+      action.val("message");
+      if (!mode.val() || mode.val() == "window") {
+        mode.val("times");
+        syncMode(form);
+      }
+      if (!color.data("touched")) {
+        setFormColor(form, "#5b6c8f");
+      }
+    }
+  }
+  function syncTtsVoiceOptions(form) {
+    var provider = form.find("select[name='tts_provider']").val();
+    var voice = form.find("select[name='tts_voice']");
+    if (!provider || !voice.length) {
+      return;
+    }
+    var selected = voice.val();
+    voice.find("option").each(function() {
+      $(this).toggleClass("d-none", $(this).data("provider") != provider);
+    });
+    if (voice.find("option:selected").data("provider") != provider) {
+      voice.val(voice.find("option[data-provider='" + provider + "']").first().val());
+    } else {
+      voice.val(selected);
     }
   }
   $("form.planner-rule").each(function(index, element) {
@@ -286,6 +318,9 @@ $(function() {
     syncMode(form);
     form.find("select[name='service']").on("change", function() {
       syncServiceDefaults(form);
+    });
+    form.find("select[name='tts_provider']").on("change", function() {
+      syncTtsVoiceOptions(form);
     });
     formColorPicker(form).on("change", function() {
       $(this).data("touched", true);

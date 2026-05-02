@@ -1,0 +1,98 @@
+{% load i18n %}
+<div class="card" id="nabtts-settings">
+  <form action="/nabtts/settings">
+    {% csrf_token %}
+    <div class="card-header">
+      <h5 class="card-title">{% trans "Text to speech" %}</h5>
+    </div>
+    <div class="card-body">
+      <p>{% trans "Send a spoken message to the rabbit." %}</p>
+      <div class="form-group">
+        <label for="nabttsText">{% trans "Message" %}</label>
+        <textarea id="nabttsText" name="text" class="form-control" rows="4" maxlength="1000"></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group col-md-4">
+          <label for="nabttsProvider">{% trans "Moteur" %}</label>
+          <select id="nabttsProvider" name="provider" class="form-control">
+            {% for provider_value, provider_label in provider_choices %}
+            <option value="{{ provider_value }}">{{ provider_label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group col-md-4">
+          <label for="nabttsVoice">{% trans "Voice" %}</label>
+          <select id="nabttsVoice" name="voice" class="form-control">
+            {% for voice_value, voice_label in voice_choices %}
+            <option value="{{ voice_value }}"{% if voice_value in edge_voice_values %} data-provider="edge"{% else %} data-provider="google"{% endif %}>{{ voice_label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group col-md-4">
+          <label for="nabttsStyle">{% trans "Intonation" %}</label>
+          <select id="nabttsStyle" name="style" class="form-control">
+            {% for style_value, style_label in style_choices %}
+            <option value="{{ style_value }}">{{ style_label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="card-footer">
+      <button type="button" class="btn btn-primary speak-button">{% trans "Say it now" %}</button>
+    </div>
+  </form>
+
+  <script type="text/javascript">
+  $(function() {
+    var form = $('#nabtts-settings form');
+    var btn = form.find('button.speak-button');
+    var providerSelect = form.find("select[name='provider']");
+    var voiceSelect = form.find("select[name='voice']");
+    function syncVoiceOptions() {
+      var provider = providerSelect.val();
+      var selected = voiceSelect.val();
+      voiceSelect.find("option").each(function() {
+        $(this).toggleClass("d-none", $(this).data("provider") != provider);
+      });
+      if (voiceSelect.find("option:selected").data("provider") != provider) {
+        voiceSelect.val(voiceSelect.find("option[data-provider='" + provider + "']").first().val());
+      } else {
+        voiceSelect.val(selected);
+      }
+    }
+    syncVoiceOptions();
+    form.find('textarea, select').on('input change', function() {
+      form.find('.tts-status').remove();
+    });
+    providerSelect.on("change", syncVoiceOptions);
+    btn.on("click", function() {
+      btn.addClass('disabled');
+      form.find('.tts-status').remove();
+      $.ajax({
+        url: form.attr('action'),
+        beforeSend: function (xhr, settings) {
+          xhr.setRequestHeader("X-CSRFToken", form.find('input[name="csrfmiddlewaretoken"]').val());
+        },
+        data: form.serialize(),
+        method: "PUT",
+        success: function () {
+          form.find('.card-body').append('<div class="alert alert-success tts-status mt-2">{% trans "Message sent." %}</div>');
+        },
+        error: function (xhr) {
+          var message = "{% trans "Unable to send message." %}";
+          if (xhr.responseJSON && xhr.responseJSON.message) {
+            message = xhr.responseJSON.message;
+          }
+          form.find('.card-body').append('<div class="alert alert-danger tts-status mt-2"></div>');
+          form.find('.tts-status').text(message);
+        },
+        complete: function () {
+          btn.removeClass('disabled');
+        }
+      });
+      return false;
+    });
+  });
+  </script>
+</div>
