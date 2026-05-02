@@ -277,3 +277,21 @@ Difference observee :
 - version lapin recuperee : stream toute URL HTTP/HTTPS comme MP3.
 
 Cette difference n'explique pas les problemes de volume/molette.
+
+## Service NFC nabsound
+
+Un service `nabsound` gere des tags NFC dedies au volume du haut-parleur du
+lapin uniquement. Il ne change pas les reglages casque.
+
+Actions encodees dans les tags :
+
+- `mute` : met `speaker-base` a `0`;
+- `up` : augmente `speaker-base` par pas de `15`;
+- `down` : baisse `speaker-base` par pas de `15`;
+- `reset` : remet `speaker-base` a `255`.
+
+Apres chaque action, le service recharge `tagtagtag-mixerd` avec :
+
+```bash
+pkill -USR1 -f tagtagtag-mixerd
+```

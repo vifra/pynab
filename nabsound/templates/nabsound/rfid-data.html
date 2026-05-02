@@ -1,0 +1,14 @@
+{% load i18n %}
+{% trans "When Nabaztag sees that NFC tag, it will change the rabbit speaker volume." %}
+<p>
+<div class="form-group row">
+  <label for="sound_action" class="col-6 col-form-label">{% trans "Sound action:" %}</label>
+  <div class="col-6">
+    <select id="sound_action" name="sound_action" class="form-control">
+      <option value="mute" {% if sound_action == "mute" %}selected{% endif %}>{% trans "Mute speaker" %}</option>
+      <option value="up" {% if sound_action == "up" %}selected{% endif %}>{% trans "Increase speaker volume" %}</option>
+      <option value="down" {% if sound_action == "down" %}selected{% endif %}>{% trans "Decrease speaker volume" %}</option>
+      <option value="reset" {% if sound_action == "reset" %}selected{% endif %}>{% trans "Reset speaker volume" %}</option>
+    </select>
+  </div>
+</div>
