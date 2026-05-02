@@ -40,6 +40,7 @@ from .views import (
 urlpatterns: List[Union[URLResolver, URLPattern]] = [
     path("", NabWebView.as_view()),
     path("planification/", include("nabplannerd.urls")),
+    path("sound/", include("nabsound.urls")),
     path("services/", NabWebServicesView.as_view()),
     path("rfid/", NabWebRfidView.as_view()),
     path("rfid/read", NabWebRfidReadView.as_view(), name="rfid.read"),

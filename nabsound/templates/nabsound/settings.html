@@ -1,0 +1,107 @@
+{% extends 'nabweb/_base.html' %}
+{% load i18n %}
+
+{% block subtitle %}{% trans "Son" %}{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-7 mb-3">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="card-title mb-0">{% trans "Son" %}</h5>
+      </div>
+      <div class="card-body">
+        {% if status %}
+        <div class="alert {% if status.ok %}alert-success{% else %}alert-danger{% endif %}">
+          {{ status.message }}
+          {% if status.output %}<pre class="mb-0 mt-2">{{ status.output }}</pre>{% endif %}
+        </div>
+        {% endif %}
+        {% if config_error %}
+        <div class="alert alert-danger">{{ config_error }}</div>
+        {% endif %}
+        <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="save">
+          <div class="form-row">
+            <div class="form-group col-md-4">
+              <label>Speaker base</label>
+              <input name="speaker-base" type="number" min="0" max="255" class="form-control" value="{{ form.speaker_base }}">
+            </div>
+            <div class="form-group col-md-4">
+              <label>TagTag bas</label>
+              <input name="tagtag-speaker-low" type="number" min="0" max="127" class="form-control" value="{{ form.tagtag_speaker_low }}">
+            </div>
+            <div class="form-group col-md-4">
+              <label>TagTag haut</label>
+              <input name="tagtag-speaker-high" type="number" min="0" max="127" class="form-control" value="{{ form.tagtag_speaker_high }}">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group col-md-4">
+              <label>Casque bas</label>
+              <input name="headphone-low" type="number" min="0" max="255" class="form-control" value="{{ form.headphone_low }}">
+            </div>
+            <div class="form-group col-md-4">
+              <label>Casque haut</label>
+              <input name="headphone-high" type="number" min="0" max="255" class="form-control" value="{{ form.headphone_high }}">
+            </div>
+            <div class="form-group col-md-4">
+              <label>Sortie jack</label>
+              <select name="lineout-mode" class="form-control">
+                <option value="lineout"{% if form.lineout_mode == "lineout" %} selected{% endif %}>Line out</option>
+                <option value="headphone"{% if form.lineout_mode == "headphone" %} selected{% endif %}>Casque</option>
+              </select>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary">{% trans "Enregistrer et appliquer" %}</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-5 mb-3">
+    <div class="card mb-3">
+      <div class="card-header">
+        <h5 class="card-title mb-0">{% trans "Etat ALSA" %}</h5>
+      </div>
+      <div class="card-body">
+        <dl class="row mb-0">
+          {% for control in alsa_controls %}
+          <dt class="col-sm-5">{{ control.label }}</dt>
+          <dd class="col-sm-7">{% if control.ok %}{{ control.value }}{% else %}<span class="text-danger">{% trans "Erreur" %}</span>{% endif %}</dd>
+          {% endfor %}
+        </dl>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <h5 class="card-title mb-0">{% trans "Maintenance" %}</h5>
+      </div>
+      <div class="card-body">
+        <form method="post" class="mb-2">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="reload">
+          <button type="submit" class="btn btn-outline-primary btn-block">{% trans "Recharger le mixeur" %}</button>
+        </form>
+        <form method="post" class="mb-2">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="reset-alsa">
+          <button type="submit" class="btn btn-outline-warning btn-block">{% trans "Reinitialiser ALSA" %}</button>
+        </form>
+        <form method="post" class="mb-2">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="store-alsa">
+          <button type="submit" class="btn btn-outline-secondary btn-block">{% trans "Sauvegarder l'etat ALSA" %}</button>
+        </form>
+        <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="restore-default">
+          <button type="submit" class="btn btn-outline-danger btn-block">{% trans "Restaurer la configuration par defaut" %}</button>
+        </form>
+        <p class="text-muted mt-3 mb-0"><small>{{ config_path }}</small></p>
+        <p class="text-muted mb-0"><small>{% trans "Backup" %}: {{ backup_path }}</small></p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
