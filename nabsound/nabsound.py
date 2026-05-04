@@ -31,6 +31,10 @@ class NabSound(NabService):
                 )
 
     def apply_action(self, action):
+        if rfid_data.is_set_action(action):
+            return audio_config.set_speaker_base(
+                rfid_data.set_action_value(action)
+            )
         if action == "mute":
             return audio_config.mute_speaker()
         if action == "up":

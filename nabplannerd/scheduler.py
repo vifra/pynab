@@ -13,6 +13,7 @@ TRIGGER_GRACE_MINUTES = 2
 SERVICE_CHOICES = [
     ("nabweatherd", "Meteo"),
     ("nabmenudujour", "Menu du jour"),
+    ("nabsound", "Son"),
     ("nabtts", "Text to speech"),
     ("nabtaichid", "Tai Chi"),
     ("nabsurprised", "Humeurs"),
@@ -25,6 +26,9 @@ ACTION_CHOICES = {
     ],
     "nabmenudujour": [
         ("today", "Menu du jour"),
+    ],
+    "nabsound": [
+        ("set", "Volume"),
     ],
     "nabtts": [
         ("message", "Message"),
@@ -205,6 +209,25 @@ async def trigger_service(service, action):
         config.next_performance_text = action or ""
         await config.save_async()
         NabTTS.signal_daemon()
+    elif service == "nabsound":
+        from nabsound import audio_config
+        from nabsound import rfid_data as sound_rfid_data
+
+        action = sound_rfid_data.unserialize(action or "reset")
+        if sound_rfid_data.is_set_action(action):
+            status = audio_config.set_speaker_base(
+                sound_rfid_data.set_action_value(action)
+            )
+        elif action == "mute":
+            status = audio_config.mute_speaker()
+        elif action == "up":
+            status = audio_config.volume_up()
+        elif action == "down":
+            status = audio_config.volume_down()
+        else:
+            status = audio_config.reset_speaker_volume()
+        if not status["ok"]:
+            raise RuntimeError(status["message"])
     elif service == "nabtaichid":
         from nabtaichid.nabtaichid import NabTaichid
 

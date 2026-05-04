@@ -6,9 +6,28 @@
   <div class="col-6">
     <select id="sound_action" name="sound_action" class="form-control">
       <option value="mute" {% if sound_action == "mute" %}selected{% endif %}>{% trans "Mute speaker" %}</option>
+      <option value="set" {% if sound_action == "set" %}selected{% endif %}>{% trans "Set speaker volume" %}</option>
       <option value="up" {% if sound_action == "up" %}selected{% endif %}>{% trans "Increase speaker volume" %}</option>
       <option value="down" {% if sound_action == "down" %}selected{% endif %}>{% trans "Decrease speaker volume" %}</option>
       <option value="reset" {% if sound_action == "reset" %}selected{% endif %}>{% trans "Reset speaker volume" %}</option>
     </select>
   </div>
 </div>
+<div class="form-group row sound-value-row">
+  <label for="sound_value" class="col-6 col-form-label">{% trans "Speaker volume value:" %}</label>
+  <div class="col-6">
+    <input id="sound_value" name="sound_value" type="number" min="0" max="255" step="1" class="form-control" value="{{ sound_value }}">
+    <small class="form-text text-muted">{% trans "Value from 0 to 255, for example 210." %}</small>
+  </div>
+</div>
+<script type="text/javascript">
+  $(function() {
+    var actionSelect = $("#sound_action");
+    var valueRow = $(".sound-value-row");
+    function updateSoundValueRow() {
+      valueRow.toggleClass("d-none", actionSelect.val() !== "set");
+    }
+    actionSelect.on("change", updateSoundValueRow);
+    updateSoundValueRow();
+  });
+</script>

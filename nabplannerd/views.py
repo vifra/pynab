@@ -16,6 +16,7 @@ from .scheduler import (
     parse_times,
     trigger_service,
 )
+from nabsound import rfid_data as sound_rfid_data
 from nabtts import rfid_data as tts_rfid_data
 from nabtts.tts import (
     EDGE_VOICE_CHOICES,
@@ -124,6 +125,11 @@ def apply_rule_form(rule, post):
             post.get("tts_style", ""),
             post.get("tts_provider", ""),
         )
+    if rule.service == "nabsound":
+        rule.action = sound_rfid_data.serialize(
+            "set",
+            post.get("sound_value", ""),
+        ).decode("utf8")
     if rule.service in ("nabtaichid", "nabsurprised"):
         rule.action = "active_window"
     rule.color = normalize_color(post.get("color", ""))
@@ -131,6 +137,8 @@ def apply_rule_form(rule, post):
     rule.mode = post.get("mode", ScheduledRule.MODE_TIMES)
     if rule.service in ("nabtaichid", "nabsurprised") or rule.action == "active_window":
         rule.mode = ScheduledRule.MODE_WINDOW
+    if rule.service == "nabsound":
+        rule.mode = ScheduledRule.MODE_TIMES
     rule.weekdays = parse_weekdays(post.getlist("weekdays"))
     if rule.mode == ScheduledRule.MODE_WINDOW:
         rule.start_time = parse_time(post.get("start_time", ""))
@@ -220,6 +228,9 @@ def decorate_rules(rules):
             rule.tts_provider = payload["provider"]
             rule.tts_voice = payload["voice"]
             rule.tts_style = payload["style"]
+        if rule.service == "nabsound":
+            action = sound_rfid_data.unserialize(rule.action)
+            rule.sound_value = sound_rfid_data.set_action_value(action)
 
 
 def build_timeline(rules, sleep_segments):
@@ -430,6 +441,14 @@ def display_rule(rule):
         if not message:
             message = "Message"
         return f"{rule.name} - {message}"
+    if rule.service == "nabsound":
+        action = sound_rfid_data.unserialize(rule.action)
+        if sound_rfid_data.is_set_action(action):
+            return (
+                f"{rule.name} - volume "
+                f"{sound_rfid_data.set_action_value(action)}"
+            )
+        return f"{rule.name} - {action}"
     if is_window_rule(rule):
         return rule.name
     elif rule.mode == ScheduledRule.MODE_INTERVAL:
@@ -460,6 +479,8 @@ def service_class(service, enabled):
         return "planner-service-menu"
     if service == "nabtts":
         return "planner-service-tts"
+    if service == "nabsound":
+        return "planner-service-sound"
     if service == "nabtaichid":
         return "planner-service-taichi"
     if service == "nabsurprised":
@@ -489,6 +510,8 @@ def rule_color(rule):
         return "#27865a"
     if rule.service == "nabtts":
         return "#5b6c8f"
+    if rule.service == "nabsound":
+        return "#6f42c1"
     if rule.service == "nabtaichid":
         return "#b45f06"
     if rule.service == "nabsurprised":

@@ -132,6 +132,9 @@
   .planner-service-tts {
     background: #5b6c8f;
   }
+  .planner-service-sound {
+    background: #6f42c1;
+  }
   .planner-service-taichi {
     background: #b45f06;
   }
@@ -262,9 +265,11 @@ $(function() {
     var ttsVoice = form.find("select[name='tts_voice']");
     form.find(".planner-action-field").toggleClass("d-none", service != "nabweatherd");
     form.find(".planner-tts-field").toggleClass("d-none", service != "nabtts");
+    form.find(".planner-sound-field").toggleClass("d-none", service != "nabsound");
     syncTtsVoiceOptions(form);
     var nativeWindowService = service == "nabtaichid" || service == "nabsurprised";
-    form.find(".planner-mode-field").toggleClass("d-none", nativeWindowService);
+    var fixedTimeOnlyService = service == "nabsound";
+    form.find(".planner-mode-field").toggleClass("d-none", nativeWindowService || fixedTimeOnlyService);
     if (nativeWindowService) {
       action.val("active_window");
       mode.val("window");
@@ -276,6 +281,13 @@ $(function() {
         }
       }
       syncMode(form);
+    } else if (fixedTimeOnlyService) {
+      action.val("set");
+      mode.val("times");
+      syncMode(form);
+      if (!color.data("touched")) {
+        setFormColor(form, "#6f42c1");
+      }
     } else if (service == "nabweatherd" && !color.data("touched")) {
       setFormColor(form, "#2077b4");
     } else if (service == "nabsurprised" && !color.data("touched")) {

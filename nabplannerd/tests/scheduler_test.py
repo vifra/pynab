@@ -1,8 +1,10 @@
+import asyncio
 import datetime
 import unittest
+from unittest import mock
 
 from nabplannerd.models import ScheduledRule
-from nabplannerd.scheduler import due_trigger_key
+from nabplannerd.scheduler import due_trigger_key, trigger_service
 
 
 class SchedulerTest(unittest.TestCase):
@@ -55,3 +57,11 @@ class SchedulerTest(unittest.TestCase):
         )
 
         self.assertEqual(key, "2026-05-01:2:interval:11:30")
+
+    @mock.patch("nabsound.audio_config.set_speaker_base")
+    def test_trigger_sound_sets_speaker_base(self, set_speaker_base):
+        set_speaker_base.return_value = {"ok": True, "message": ""}
+
+        asyncio.run(trigger_service("nabsound", "set:210"))
+
+        set_speaker_base.assert_called_once_with(210)

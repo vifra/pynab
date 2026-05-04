@@ -64,15 +64,22 @@ class RFIDDataView(TemplateView):
     def get(self, request, *args, **kwargs):
         data = request.GET.get("data", "")
         action = rfid_data.unserialize(data)
+        value = rfid_data.set_action_value(action)
         return render(
             request,
             self.template_name,
-            {"sound_action": action},
+            {
+                "sound_action": "set"
+                if rfid_data.is_set_action(action)
+                else action,
+                "sound_value": value,
+            },
         )
 
     def post(self, request, *args, **kwargs):
         action = request.POST.get("sound_action", rfid_data.DEFAULT_ACTION)
-        data = rfid_data.serialize(action).decode("utf8")
+        value = request.POST.get("sound_value")
+        data = rfid_data.serialize(action, value).decode("utf8")
         return JsonResponse({"data": data})
 
 
