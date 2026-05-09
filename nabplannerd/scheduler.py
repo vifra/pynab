@@ -1,9 +1,11 @@
 import datetime
+import json
 import logging
 from typing import Iterable, Optional
 
 from asgiref.sync import sync_to_async
 from dateutil import tz
+import requests
 
 from .models import ScheduledRule
 
@@ -15,6 +17,7 @@ SERVICE_CHOICES = [
     ("nabmenudujour", "Menu du jour"),
     ("nabsound", "Son"),
     ("nabtts", "Text to speech"),
+    ("nabhomeassistant", "Home Assistant"),
     ("nabtaichid", "Tai Chi"),
     ("nabsurprised", "Humeurs"),
 ]
@@ -33,6 +36,9 @@ ACTION_CHOICES = {
     "nabtts": [
         ("message", "Message"),
     ],
+    "nabhomeassistant": [
+        ("read_state", "Lire une entite"),
+    ],
     "nabtaichid": [
         ("active_window", "Plage active"),
     ],
@@ -48,6 +54,36 @@ def available_services():
 
 def available_actions():
     return ACTION_CHOICES
+
+
+def serialize_homeassistant_action(entity_id, speech_regex="", speech_replacement=""):
+    return json.dumps(
+        {
+            "action_type": "read_state",
+            "entity_id": str(entity_id or "").strip(),
+            "speech_regex": str(speech_regex or "").strip(),
+            "speech_replacement": str(speech_replacement or "").strip(),
+        },
+        ensure_ascii=False,
+    )
+
+
+def unserialize_homeassistant_action(value):
+    if isinstance(value, dict):
+        data = value
+    else:
+        try:
+            data = json.loads(value or "{}")
+        except Exception:
+            data = {}
+    if not isinstance(data, dict):
+        data = {}
+    return {
+        "action_type": "read_state",
+        "entity_id": data.get("entity_id", "") or "",
+        "speech_regex": data.get("speech_regex", "") or "",
+        "speech_replacement": data.get("speech_replacement", "") or "",
+    }
 
 
 def local_now():
@@ -228,6 +264,43 @@ async def trigger_service(service, action):
             status = audio_config.reset_speaker_volume()
         if not status["ok"]:
             raise RuntimeError(status["message"])
+    elif service == "nabhomeassistant":
+        from nabhomeassistant.models import Config as HomeAssistantConfig
+        from nabhomeassistant.nabhomeassistant import (
+            apply_speech_rewrite,
+            home_assistant_state_text,
+        )
+        from nabtts import rfid_data as tts_rfid_data
+        from nabtts.models import Config as TTSConfig
+        from nabtts.nabtts import NabTTS
+
+        homeassistant_action = unserialize_homeassistant_action(action)
+        entity_id = homeassistant_action["entity_id"].strip()
+        if not entity_id:
+            raise ValueError("Missing Home Assistant entity id")
+        homeassistant_config = await HomeAssistantConfig.load_async()
+        base_url = (homeassistant_config.base_url or "").rstrip("/")
+        access_token = homeassistant_config.access_token or ""
+        if not base_url or not access_token:
+            raise ValueError("Home Assistant is not configured")
+        response = requests.get(
+            f"{base_url}/api/states/{entity_id}",
+            headers={"Authorization": f"Bearer {access_token}"},
+            timeout=10,
+        )
+        response.raise_for_status()
+        state = response.json()
+        if not isinstance(state, dict):
+            raise ValueError("Home Assistant returned a non-object state")
+        text = home_assistant_state_text(entity_id, state)
+        text = apply_speech_rewrite(homeassistant_action, text)
+        tts_config = await TTSConfig.load_async()
+        tts_config.next_performance_date = datetime.datetime.now(
+            datetime.timezone.utc
+        )
+        tts_config.next_performance_text = tts_rfid_data.serialize_payload(text)
+        await tts_config.save_async()
+        NabTTS.signal_daemon()
     elif service == "nabtaichid":
         from nabtaichid.nabtaichid import NabTaichid
 

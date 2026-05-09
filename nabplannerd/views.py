@@ -14,7 +14,9 @@ from .scheduler import (
     is_in_window,
     minutes_since_midnight,
     parse_times,
+    serialize_homeassistant_action,
     trigger_service,
+    unserialize_homeassistant_action,
 )
 from nabsound import rfid_data as sound_rfid_data
 from nabtts import rfid_data as tts_rfid_data
@@ -130,6 +132,12 @@ def apply_rule_form(rule, post):
             "set",
             post.get("sound_value", ""),
         ).decode("utf8")
+    if rule.service == "nabhomeassistant":
+        rule.action = serialize_homeassistant_action(
+            post.get("homeassistant_entity_id", ""),
+            post.get("homeassistant_speech_regex", ""),
+            post.get("homeassistant_speech_replacement", ""),
+        )
     if rule.service in ("nabtaichid", "nabsurprised"):
         rule.action = "active_window"
     rule.color = normalize_color(post.get("color", ""))
@@ -231,6 +239,13 @@ def decorate_rules(rules):
         if rule.service == "nabsound":
             action = sound_rfid_data.unserialize(rule.action)
             rule.sound_value = sound_rfid_data.set_action_value(action)
+        if rule.service == "nabhomeassistant":
+            action = unserialize_homeassistant_action(rule.action)
+            rule.homeassistant_entity_id = action["entity_id"]
+            rule.homeassistant_speech_regex = action["speech_regex"]
+            rule.homeassistant_speech_replacement = action[
+                "speech_replacement"
+            ]
 
 
 def build_timeline(rules, sleep_segments):
@@ -449,6 +464,9 @@ def display_rule(rule):
                 f"{sound_rfid_data.set_action_value(action)}"
             )
         return f"{rule.name} - {action}"
+    if rule.service == "nabhomeassistant":
+        action = unserialize_homeassistant_action(rule.action)
+        return f"{rule.name} - {action['entity_id'] or 'entite'}"
     if is_window_rule(rule):
         return rule.name
     elif rule.mode == ScheduledRule.MODE_INTERVAL:
@@ -481,6 +499,8 @@ def service_class(service, enabled):
         return "planner-service-tts"
     if service == "nabsound":
         return "planner-service-sound"
+    if service == "nabhomeassistant":
+        return "planner-service-homeassistant"
     if service == "nabtaichid":
         return "planner-service-taichi"
     if service == "nabsurprised":
@@ -512,6 +532,8 @@ def rule_color(rule):
         return "#5b6c8f"
     if rule.service == "nabsound":
         return "#6f42c1"
+    if rule.service == "nabhomeassistant":
+        return "#0f766e"
     if rule.service == "nabtaichid":
         return "#b45f06"
     if rule.service == "nabsurprised":

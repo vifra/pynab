@@ -135,6 +135,9 @@
   .planner-service-sound {
     background: #6f42c1;
   }
+  .planner-service-homeassistant {
+    background: #0f766e;
+  }
   .planner-service-taichi {
     background: #b45f06;
   }
@@ -266,6 +269,7 @@ $(function() {
     form.find(".planner-action-field").toggleClass("d-none", service != "nabweatherd");
     form.find(".planner-tts-field").toggleClass("d-none", service != "nabtts");
     form.find(".planner-sound-field").toggleClass("d-none", service != "nabsound");
+    form.find(".planner-homeassistant-field").toggleClass("d-none", service != "nabhomeassistant");
     syncTtsVoiceOptions(form);
     var nativeWindowService = service == "nabtaichid" || service == "nabsurprised";
     var fixedTimeOnlyService = service == "nabsound";
@@ -305,6 +309,15 @@ $(function() {
       }
       if (!color.data("touched")) {
         setFormColor(form, "#5b6c8f");
+      }
+    } else if (service == "nabhomeassistant") {
+      action.val("read_state");
+      if (!mode.val() || mode.val() == "window") {
+        mode.val("times");
+        syncMode(form);
+      }
+      if (!color.data("touched")) {
+        setFormColor(form, "#0f766e");
       }
     }
   }
@@ -352,6 +365,70 @@ $(function() {
       form.find("input[name='weekdays']").prop("checked", false);
       days.forEach(function(day) {
         form.find("input[name='weekdays'][value='" + day + "']").prop("checked", true);
+      });
+    });
+    form.find(".planner-homeassistant-load-entities").on("click", function() {
+      var button = $(this);
+      var status = form.find(".planner-homeassistant-status");
+      var datalist = form.find(".planner-homeassistant-entities");
+      button.prop("disabled", true);
+      status.removeClass("text-danger text-success").addClass("text-muted").text("Chargement des entites...");
+      $.ajax({
+        url: "/nabhomeassistant/entities",
+        method: "GET",
+        success: function(data) {
+          var entities = data.entities || [];
+          datalist.empty();
+          entities.forEach(function(entity) {
+            var label = entity.name;
+            var value = entity.state;
+            if (entity.unit) {
+              value += " " + entity.unit;
+            }
+            if (value) {
+              label += " - " + value;
+            }
+            datalist.append($("<option></option>").attr("value", entity.entity_id).attr("label", label));
+          });
+          status.removeClass("text-danger").addClass("text-muted").text(entities.length + " entites chargees.");
+        },
+        error: function(xhr) {
+          var data = xhr.responseJSON || {};
+          status.removeClass("text-muted text-success").addClass("text-danger").text(data.message || "Impossible de charger les entites.");
+        },
+        complete: function() {
+          button.prop("disabled", false);
+        }
+      });
+    });
+    form.find(".planner-homeassistant-preview").on("click", function() {
+      var button = $(this);
+      var status = form.find(".planner-homeassistant-preview-status");
+      var entityId = form.find("input[name='homeassistant_entity_id']").val();
+      if (!entityId) {
+        status.removeClass("text-muted text-success").addClass("text-danger").text("Choisis une entite Home Assistant.");
+        return;
+      }
+      button.prop("disabled", true);
+      status.removeClass("text-danger text-success").addClass("text-muted").text("Lecture en cours...");
+      $.ajax({
+        url: "/nabhomeassistant/preview-state",
+        method: "GET",
+        data: {
+          entity_id: entityId,
+          speech_regex: form.find("input[name='homeassistant_speech_regex']").val(),
+          speech_replacement: form.find("input[name='homeassistant_speech_replacement']").val()
+        },
+        success: function(data) {
+          status.removeClass("text-muted text-danger").addClass("text-success").text(data.spoken_text);
+        },
+        error: function(xhr) {
+          var data = xhr.responseJSON || {};
+          status.removeClass("text-muted text-success").addClass("text-danger").text(data.message || "Impossible de lire cette entite.");
+        },
+        complete: function() {
+          button.prop("disabled", false);
+        }
       });
     });
   });

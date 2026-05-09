@@ -3,8 +3,21 @@ import datetime
 import unittest
 from unittest import mock
 
+import pytest
+
 from nabplannerd.models import ScheduledRule
 from nabplannerd.scheduler import due_trigger_key, trigger_service
+
+
+class FakeResponse:
+    def __init__(self, json_data):
+        self._json_data = json_data
+
+    def raise_for_status(self):
+        pass
+
+    def json(self):
+        return self._json_data
 
 
 class SchedulerTest(unittest.TestCase):
@@ -65,3 +78,52 @@ class SchedulerTest(unittest.TestCase):
         asyncio.run(trigger_service("nabsound", "set:210"))
 
         set_speaker_base.assert_called_once_with(210)
+
+
+@pytest.mark.django_db
+class SchedulerDBTest(unittest.TestCase):
+    @mock.patch("nabtts.nabtts.NabTTS.signal_daemon")
+    @mock.patch("nabplannerd.scheduler.requests.get")
+    def test_trigger_homeassistant_reads_entity_and_schedules_tts(
+        self, requests_get, signal_daemon
+    ):
+        from nabhomeassistant.models import Config as HomeAssistantConfig
+        from nabplannerd.scheduler import serialize_homeassistant_action
+        from nabtts import rfid_data as tts_rfid_data
+        from nabtts.models import Config as TTSConfig
+
+        homeassistant_config = HomeAssistantConfig.load()
+        homeassistant_config.base_url = "http://homeassistant.local:8123/"
+        homeassistant_config.access_token = "token"
+        homeassistant_config.save()
+        requests_get.return_value = FakeResponse(
+            {
+                "state": "2396.0",
+                "attributes": {
+                    "friendly_name": "SOLR Day Production ",
+                    "unit_of_measurement": "Wh",
+                },
+            }
+        )
+        action = serialize_homeassistant_action(
+            "sensor.solr_day_production",
+            r"^SOLR Day Production vaut (.+) Wh$",
+            r"La production solaire est de \1 Watt heure",
+        )
+
+        asyncio.run(trigger_service("nabhomeassistant", action))
+
+        tts_config = TTSConfig.load()
+        payload = tts_rfid_data.unserialize_payload(
+            tts_config.next_performance_text
+        )
+        self.assertEqual(
+            payload["text"], "La production solaire est de 2396.0 Watt heure"
+        )
+        requests_get.assert_called_once_with(
+            "http://homeassistant.local:8123/api/states/"
+            "sensor.solr_day_production",
+            headers={"Authorization": "Bearer token"},
+            timeout=10,
+        )
+        signal_daemon.assert_called_once()

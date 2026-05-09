@@ -40,6 +40,34 @@
     <input name="sound_value" type="number" min="0" max="255" step="1" class="form-control" value="{% if rule and rule.service == "nabsound" %}{{ rule.sound_value }}{% else %}255{% endif %}">
     <small class="form-text text-muted">{% trans "Valeur de 0 a 255, par exemple 210." %}</small>
   </div>
+  <div class="planner-homeassistant-field">
+    <div class="form-group">
+      <label>{% trans "Entite Home Assistant" %}</label>
+      <div class="input-group">
+        <select name="homeassistant_entity_id" class="form-control planner-homeassistant-entity-select" data-current="{% if rule and rule.service == "nabhomeassistant" %}{{ rule.homeassistant_entity_id }}{% endif %}">
+          <option value="">{% trans "Choisir une entite" %}</option>
+          {% if rule and rule.service == "nabhomeassistant" and rule.homeassistant_entity_id %}
+          <option value="{{ rule.homeassistant_entity_id }}" selected>{{ rule.homeassistant_entity_id }}</option>
+          {% endif %}
+        </select>
+        <div class="input-group-append">
+          <button type="button" class="btn btn-outline-secondary planner-homeassistant-load-entities">{% trans "Charger" %}</button>
+          <button type="button" class="btn btn-outline-secondary planner-homeassistant-preview">{% trans "Tester" %}</button>
+        </div>
+      </div>
+      <div class="small text-muted planner-homeassistant-status mt-1"></div>
+      <div class="small planner-homeassistant-preview-status mt-1"></div>
+    </div>
+    <div class="form-group">
+      <label>{% trans "Regexp du texte lu" %}</label>
+      <input name="homeassistant_speech_regex" type="text" class="form-control" value="{% if rule and rule.service == "nabhomeassistant" %}{{ rule.homeassistant_speech_regex }}{% endif %}" placeholder="^SOLR Day Production vaut (.+) Wh$">
+    </div>
+    <div class="form-group">
+      <label>{% trans "Texte remplace" %}</label>
+      <input name="homeassistant_speech_replacement" type="text" class="form-control" value="{% if rule and rule.service == "nabhomeassistant" %}{{ rule.homeassistant_speech_replacement }}{% endif %}" placeholder="La production solaire est de \1 Watt heure">
+      <small class="form-text text-muted">{% trans "Laisse vide pour garder le texte automatique. Utilise \\1, \\2... pour reprendre les groupes captures." %}</small>
+    </div>
+  </div>
   <div class="form-row planner-tts-field">
     <div class="form-group col-md-4">
       <label>{% trans "Moteur" %}</label>
