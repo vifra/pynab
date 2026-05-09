@@ -1,0 +1,163 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: pynab nabplannerd\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-09 00:00+0000\n"
+"PO-Revision-Date: 2026-05-09 00:00+0000\n"
+"Language: it_IT\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Planification"
+msgstr "Pianificazione"
+
+msgid "Masquer la legende"
+msgstr "Nascondi la legenda"
+
+msgid "Afficher la legende"
+msgstr "Mostra la legenda"
+
+msgid "Nouvelle regle"
+msgstr "Nuova regola"
+
+msgid "Vue hebdomadaire"
+msgstr "Vista settimanale"
+
+msgid "Lapin endormi"
+msgstr "Coniglio addormentato"
+
+msgid "Legende"
+msgstr "Legenda"
+
+msgid "Aucune regle"
+msgstr "Nessuna regola"
+
+msgid "Regle de planification"
+msgstr "Regola di pianificazione"
+
+msgid "Fermer"
+msgstr "Chiudi"
+
+msgid "Couleur"
+msgstr "Colore"
+
+msgid "Supprimer"
+msgstr "Elimina"
+
+msgid "Declencher"
+msgstr "Esegui"
+
+msgid "Aucune regle de planification."
+msgstr "Nessuna regola di pianificazione."
+
+msgid "Titre"
+msgstr "Titolo"
+
+msgid "Nom affiche dans le calendrier"
+msgstr "Nome visualizzato nel calendario"
+
+msgid "Service"
+msgstr "Servizio"
+
+msgid "Choisir un service"
+msgstr "Scegli un servizio"
+
+msgid "Action"
+msgstr "Azione"
+
+msgid "Aujourd'hui / defaut"
+msgstr "Oggi / predefinito"
+
+msgid "Demain"
+msgstr "Domani"
+
+msgid "Plage active"
+msgstr "Fascia attiva"
+
+msgid "Type"
+msgstr "Tipo"
+
+msgid "Choisir un type"
+msgstr "Scegli un tipo"
+
+msgid "Heures fixes"
+msgstr "Orari fissi"
+
+msgid "Recurrence"
+msgstr "Ricorrenza"
+
+msgid "Plage d'activite"
+msgstr "Fascia di attività"
+
+msgid "Message"
+msgstr "Messaggio"
+
+msgid "Volume du haut-parleur"
+msgstr "Volume dell'altoparlante"
+
+msgid "Valeur de 0 a 255, par exemple 210."
+msgstr "Valore da 0 a 255, per esempio 210."
+
+msgid "Entite Home Assistant"
+msgstr "Entità Home Assistant"
+
+msgid "Charger"
+msgstr "Carica"
+
+msgid "Tester"
+msgstr "Prova"
+
+msgid "Regexp du texte lu"
+msgstr "Espressione regolare del testo letto"
+
+msgid "Texte remplace"
+msgstr "Testo sostitutivo"
+
+msgid "Laisse vide pour garder le texte automatique. Utilise \\\\1, \\\\2... pour reprendre les groupes captures."
+msgstr "Lascia vuoto per mantenere il testo automatico. Usa \\\\1, \\\\2... per riutilizzare i gruppi catturati."
+
+msgid "Moteur"
+msgstr "Motore"
+
+msgid "Voix"
+msgstr "Voce"
+
+msgid "Intonation"
+msgstr "Intonazione"
+
+msgid "Jours actifs"
+msgstr "Giorni attivi"
+
+msgid "Semaine"
+msgstr "Settimana"
+
+msgid "Week-end"
+msgstr "Fine settimana"
+
+msgid "Tous"
+msgstr "Tutti"
+
+msgid "Debut de plage"
+msgstr "Inizio fascia"
+
+msgid "Fin de plage"
+msgstr "Fine fascia"
+
+msgid "Heures de declenchement"
+msgstr "Orari di attivazione"
+
+msgid "Toutes les N minutes"
+msgstr "Ogni N minuti"
+
+msgid "A partir de"
+msgstr "A partire da"
+
+msgid "Jusqu'a"
+msgstr "Fino a"
+
+msgid "Active"
+msgstr "Attiva"
+
+msgid "Enregistrer"
+msgstr "Salva"

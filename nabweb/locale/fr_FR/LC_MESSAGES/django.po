@@ -423,6 +423,9 @@ msgstr ""
 msgid "Tag was successfully configured."
 msgstr "Le tag a été configuré avec succès."
 
+msgid "Technology"
+msgstr "Technologie"
+
 #: templates/nabweb/rfid/index.html:65
 msgid "Status"
 msgstr "Statut"

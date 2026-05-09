@@ -1,0 +1,70 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: pynab nabhomeassistant\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-09 00:00+0000\n"
+"PO-Revision-Date: 2026-05-09 00:00+0000\n"
+"Language: it_IT\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Home Assistant"
+msgstr "Home Assistant"
+
+msgid "Quand Nabaztag voit ce tag NFC, il peut lire une valeur Home Assistant ou appeler un service."
+msgstr "Quando Nabaztag vede questo tag NFC, può leggere un valore di Home Assistant o chiamare un servizio."
+
+msgid "Action"
+msgstr "Azione"
+
+msgid "Lire une entite"
+msgstr "Leggi un'entità"
+
+msgid "Appeler un service"
+msgstr "Chiama un servizio"
+
+msgid "Service Home Assistant"
+msgstr "Servizio Home Assistant"
+
+msgid "Entite"
+msgstr "Entità"
+
+msgid "Charger"
+msgstr "Carica"
+
+msgid "Tester"
+msgstr "Prova"
+
+msgid "Regexp du texte lu"
+msgstr "Espressione regolare del testo letto"
+
+msgid "Texte remplace"
+msgstr "Testo sostitutivo"
+
+msgid "Laisse vide pour garder le texte automatique. Utilise \\\\1, \\\\2... pour reprendre les groupes captures."
+msgstr "Lascia vuoto per mantenere il testo automatico. Usa \\\\1, \\\\2... per riutilizzare i gruppi catturati."
+
+msgid "Donnees JSON"
+msgstr "Dati JSON"
+
+msgid "Configure la connexion a Home Assistant pour declencher des services quand Nabaztag voit un tag NFC."
+msgstr "Configura la connessione a Home Assistant per attivare servizi quando Nabaztag vede un tag NFC."
+
+msgid "Cree un jeton d'acces longue duree dans Home Assistant, puis colle son adresse et le jeton ci-dessous."
+msgstr "Crea un token di accesso a lunga durata in Home Assistant, poi incolla qui sotto l'indirizzo e il token."
+
+msgid "Adresse Home Assistant"
+msgstr "Indirizzo Home Assistant"
+
+msgid "Jeton d'acces"
+msgstr "Token di accesso"
+
+msgid "Tester la connexion"
+msgstr "Prova la connessione"
+
+msgid "Save"
+msgstr "Salva"
+
+msgid "Reset"
+msgstr "Ripristina"

@@ -1,0 +1,163 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: pynab nabplannerd\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-09 00:00+0000\n"
+"PO-Revision-Date: 2026-05-09 00:00+0000\n"
+"Language: fr_FR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Planification"
+msgstr "Planification"
+
+msgid "Masquer la legende"
+msgstr "Masquer la légende"
+
+msgid "Afficher la legende"
+msgstr "Afficher la légende"
+
+msgid "Nouvelle regle"
+msgstr "Nouvelle règle"
+
+msgid "Vue hebdomadaire"
+msgstr "Vue hebdomadaire"
+
+msgid "Lapin endormi"
+msgstr "Lapin endormi"
+
+msgid "Legende"
+msgstr "Légende"
+
+msgid "Aucune regle"
+msgstr "Aucune règle"
+
+msgid "Regle de planification"
+msgstr "Règle de planification"
+
+msgid "Fermer"
+msgstr "Fermer"
+
+msgid "Couleur"
+msgstr "Couleur"
+
+msgid "Supprimer"
+msgstr "Supprimer"
+
+msgid "Declencher"
+msgstr "Déclencher"
+
+msgid "Aucune regle de planification."
+msgstr "Aucune règle de planification."
+
+msgid "Titre"
+msgstr "Titre"
+
+msgid "Nom affiche dans le calendrier"
+msgstr "Nom affiché dans le calendrier"
+
+msgid "Service"
+msgstr "Service"
+
+msgid "Choisir un service"
+msgstr "Choisir un service"
+
+msgid "Action"
+msgstr "Action"
+
+msgid "Aujourd'hui / defaut"
+msgstr "Aujourd'hui / défaut"
+
+msgid "Demain"
+msgstr "Demain"
+
+msgid "Plage active"
+msgstr "Plage active"
+
+msgid "Type"
+msgstr "Type"
+
+msgid "Choisir un type"
+msgstr "Choisir un type"
+
+msgid "Heures fixes"
+msgstr "Heures fixes"
+
+msgid "Recurrence"
+msgstr "Récurrence"
+
+msgid "Plage d'activite"
+msgstr "Plage d'activité"
+
+msgid "Message"
+msgstr "Message"
+
+msgid "Volume du haut-parleur"
+msgstr "Volume du haut-parleur"
+
+msgid "Valeur de 0 a 255, par exemple 210."
+msgstr "Valeur de 0 à 255, par exemple 210."
+
+msgid "Entite Home Assistant"
+msgstr "Entité Home Assistant"
+
+msgid "Charger"
+msgstr "Charger"
+
+msgid "Tester"
+msgstr "Tester"
+
+msgid "Regexp du texte lu"
+msgstr "Expression régulière du texte lu"
+
+msgid "Texte remplace"
+msgstr "Texte remplacé"
+
+msgid "Laisse vide pour garder le texte automatique. Utilise \\\\1, \\\\2... pour reprendre les groupes captures."
+msgstr "Laisse vide pour garder le texte automatique. Utilise \\\\1, \\\\2... pour reprendre les groupes capturés."
+
+msgid "Moteur"
+msgstr "Moteur"
+
+msgid "Voix"
+msgstr "Voix"
+
+msgid "Intonation"
+msgstr "Intonation"
+
+msgid "Jours actifs"
+msgstr "Jours actifs"
+
+msgid "Semaine"
+msgstr "Semaine"
+
+msgid "Week-end"
+msgstr "Week-end"
+
+msgid "Tous"
+msgstr "Tous"
+
+msgid "Debut de plage"
+msgstr "Début de plage"
+
+msgid "Fin de plage"
+msgstr "Fin de plage"
+
+msgid "Heures de declenchement"
+msgstr "Heures de déclenchement"
+
+msgid "Toutes les N minutes"
+msgstr "Toutes les N minutes"
+
+msgid "A partir de"
+msgstr "À partir de"
+
+msgid "Jusqu'a"
+msgstr "Jusqu'à"
+
+msgid "Active"
+msgstr "Active"
+
+msgid "Enregistrer"
+msgstr "Enregistrer"

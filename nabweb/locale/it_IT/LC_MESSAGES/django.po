@@ -1,0 +1,211 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: pynab nabweb\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-09 00:00+0000\n"
+"PO-Revision-Date: 2026-05-09 00:00+0000\n"
+"Language: it_IT\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Nabaztag configuration"
+msgstr "Configurazione Nabaztag"
+
+msgid "Home"
+msgstr "Home"
+
+msgid "Services"
+msgstr "Servizi"
+
+msgid "Planification"
+msgstr "Pianificazione"
+
+msgid "Son"
+msgstr "Audio"
+
+msgid "NFC"
+msgstr "NFC"
+
+msgid "System Information"
+msgstr "Informazioni di sistema"
+
+msgid "Upgrade"
+msgstr "Aggiornamento"
+
+msgid "Help"
+msgstr "Aiuto"
+
+msgid "(current)"
+msgstr "(corrente)"
+
+msgid "Tag with foreign data"
+msgstr "Tag con dati esterni"
+
+msgid "This tag has foreign data. Are you sure you want to replace this data?"
+msgstr "Questo tag contiene dati esterni. Vuoi davvero sostituirli?"
+
+msgid "Yes"
+msgstr "Sì"
+
+msgid "No"
+msgstr "No"
+
+msgid "To be used by applications, NFC tags (including Violet's ztamp:s) must be configured."
+msgstr "Per essere usati dalle applicazioni, i tag NFC, inclusi gli ztamp:s di Violet, devono essere configurati."
+
+msgid "To configure an NFC tag, start with pressing the button below and then when your Nabaztag's nose turns red, put a tag under it."
+msgstr "Per configurare un tag NFC, premi prima il pulsante qui sotto; quando il naso del Nabaztag diventa rosso, metti il tag sotto di esso."
+
+msgid "Edit the configuration, then press <kbd class=\"btn-danger\">Write tag</kbd> button below and put the tag under your Nabaztag's red nose until you see a confirmation message."
+msgstr "Modifica la configurazione, poi premi il pulsante <kbd class=\"btn-danger\">Scrivi tag</kbd> qui sotto e metti il tag sotto il naso rosso del Nabaztag finché non compare un messaggio di conferma."
+
+msgid "No tag was detected."
+msgstr "Nessun tag rilevato."
+
+msgid "This tag was not detected. To write it, click the 'Write tag' button and put it again under your Nabaztag's nose when it turns red. If you want to write another tag, click 'Configure' button first."
+msgstr "Questo tag non è stato rilevato. Per scriverlo, fai clic sul pulsante 'Scrivi tag' e rimettilo sotto il naso del Nabaztag quando diventa rosso. Se vuoi scrivere un altro tag, fai prima clic sul pulsante 'Configura'."
+
+msgid "Tag was successfully configured."
+msgstr "Il tag è stato configurato correttamente."
+
+msgid "Technology"
+msgstr "Tecnologia"
+
+msgid "Status"
+msgstr "Stato"
+
+msgid "Picture"
+msgstr "Immagine"
+
+msgid "Application"
+msgstr "Applicazione"
+
+msgid "None"
+msgstr "Nessuno"
+
+msgid "NFC or RFID support is not available (no reader detected)"
+msgstr "Il supporto NFC o RFID non è disponibile, nessun lettore rilevato."
+
+msgid "Configure tag"
+msgstr "Configura tag"
+
+msgid "Configure another tag"
+msgstr "Configura un altro tag"
+
+msgid "Write tag"
+msgstr "Scrivi tag"
+
+msgid "Supported"
+msgstr "Supportato"
+
+msgid "Supported (but read-only)"
+msgstr "Supportato, ma in sola lettura"
+
+msgid "Supported (but with unknown data)"
+msgstr "Supportato, ma con dati sconosciuti"
+
+msgid "Locked (cannot be used)"
+msgstr "Bloccato, non utilizzabile"
+
+msgid "Unsupported PICC (file a GitHub issue with UID to see if support can be added)"
+msgstr "PICC non supportato. Apri una segnalazione su GitHub con l'UID per verificare se il supporto può essere aggiunto."
+
+msgid "Unknown response: "
+msgstr "Risposta sconosciuta: "
+
+msgid "An unknown server error occurred"
+msgstr "Si è verificato un errore server sconosciuto"
+
+msgid "NFC Tag Blue"
+msgstr "Tag NFC blu"
+
+msgid "NFC Tag Violet"
+msgstr "Tag NFC viola"
+
+msgid "NFC Tag Red"
+msgstr "Tag NFC rosso"
+
+msgid "NFC Tag Orange"
+msgstr "Tag NFC arancione"
+
+msgid "Unknown"
+msgstr "Sconosciuto"
+
+msgid "Violet Rabbit"
+msgstr "Coniglio viola"
+
+msgid "Blue note"
+msgstr "Nota blu"
+
+msgid "Red heart"
+msgstr "Cuore rosso"
+
+msgid "Orange apple"
+msgstr "Mela arancione"
+
+msgid "Orange teacup"
+msgstr "Tazza arancione"
+
+msgid "Violet rocket"
+msgstr "Razzo viola"
+
+msgid "Green cabbage"
+msgstr "Cavolo verde"
+
+msgid "Blue dog"
+msgstr "Cane blu"
+
+msgid "Red flower"
+msgstr "Fiore rosso"
+
+msgid "Green snail"
+msgstr "Lumaca verde"
+
+msgid "Yellow smile"
+msgstr "Sorriso giallo"
+
+msgid "Yellow gift"
+msgstr "Regalo giallo"
+
+msgid "Green bike"
+msgstr "Bici verde"
+
+msgid "Violet key"
+msgstr "Chiave viola"
+
+msgid "Blue can"
+msgstr "Lattina blu"
+
+msgid "Dark moderate green"
+msgstr "Verde scuro moderato"
+
+msgid "Grayish blue"
+msgstr "Blu grigiastro"
+
+msgid "Vivid orange"
+msgstr "Arancione vivo"
+
+msgid "Bright yellow"
+msgstr "Giallo brillante"
+
+msgid "Dark cyan"
+msgstr "Ciano scuro"
+
+msgid "Vivid pink"
+msgstr "Rosa vivo"
+
+msgid "Pure yellow"
+msgstr "Giallo puro"
+
+msgid "Darker vivid orange"
+msgstr "Arancione vivo più scuro"
+
+msgid "Nanoztag kiwi"
+msgstr "Nanoztag kiwi"
+
+msgid "Nanoztag azur"
+msgstr "Nanoztag azzurro"
+
+msgid "Nanoztag black"
+msgstr "Nanoztag nero"

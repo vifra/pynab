@@ -1,0 +1,58 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: fr_FR\n"
+
+msgid "LEDs"
+msgstr "LEDs"
+
+msgid "Animation active"
+msgstr "Animation active"
+
+msgid "Mode"
+msgstr "Mode"
+
+msgid "Respiration"
+msgstr "Respiration"
+
+msgid "Couleur fixe"
+msgstr "Couleur fixe"
+
+msgid "JSON avance"
+msgstr "JSON avancé"
+
+msgid "Eteint"
+msgstr "Éteint"
+
+msgid "Couleur"
+msgstr "Couleur"
+
+msgid "LEDs du ventre"
+msgstr "LEDs du ventre"
+
+msgid "Gauche"
+msgstr "Gauche"
+
+msgid "Centre"
+msgstr "Centre"
+
+msgid "Droite"
+msgstr "Droite"
+
+msgid "Luminosite"
+msgstr "Luminosité"
+
+msgid "Tempo"
+msgstr "Tempo"
+
+msgid "Animation JSON"
+msgstr "Animation JSON"
+
+msgid "La respiration idle utilise les trois LEDs du ventre, comme les animations meteo."
+msgstr "La respiration au repos utilise les trois LEDs du ventre, comme les animations météo."
+
+msgid "Save"
+msgstr "Enregistrer"
+
+msgid "Reset"
+msgstr "Réinitialiser"
