@@ -209,3 +209,93 @@ msgstr "Nanoztag azzurro"
 
 msgid "Nanoztag black"
 msgstr "Nanoztag nero"
+
+msgid "LEDs"
+msgstr "LED"
+
+msgid "LED usage summary"
+msgstr "Riepilogo uso LED"
+
+msgid "Idle visual animations are played one after another; they are not merged LED by LED."
+msgstr "Le animazioni visive a riposo vengono riprodotte una dopo l'altra; non vengono fuse LED per LED."
+
+msgid "LED"
+msgstr "LED"
+
+msgid "Configured uses"
+msgstr "Usi configurati"
+
+msgid "Alternating display"
+msgstr "Visualizzazione alternata"
+
+msgid "Modules"
+msgstr "Moduli"
+
+msgid "Module"
+msgstr "Modulo"
+
+msgid "Left LED"
+msgstr "LED sinistro"
+
+msgid "Center LED"
+msgstr "LED centrale"
+
+msgid "Right LED"
+msgstr "LED destro"
+
+msgid "Bottom LED"
+msgstr "LED inferiore"
+
+msgid "Rabbit"
+msgstr "Coniglio"
+
+msgid "Network status pulse"
+msgstr "Respiro stato rete"
+
+msgid "Native"
+msgstr "Nativo"
+
+msgid "Fuchsia when everything is fine, orange without Internet, red without local network."
+msgstr "Fucsia quando tutto va bene, arancione senza Internet, rosso senza rete locale."
+
+msgid "Free"
+msgstr "Libero"
+
+msgid "No configured use"
+msgstr "Nessun uso configurato"
+
+msgid "Weather"
+msgstr "Meteo"
+
+msgid "Air quality"
+msgstr "Qualità dell'aria"
+
+msgid "Visual animation disabled"
+msgstr "Animazione visiva disattivata"
+
+msgid "%(name)s, custom animation"
+msgstr "%(name)s, animazione personalizzata"
+
+msgid "%(name)s, default animation"
+msgstr "%(name)s, animazione predefinita"
+
+msgid "Custom"
+msgstr "Personalizzata"
+
+msgid "Default, three LEDs"
+msgstr "Predefinita, tre LED"
+
+msgid "Left + center + right"
+msgstr "Sinistra + centro + destra"
+
+msgid "Default weather animations use the three visual LEDs; custom weather animations use the selected LED only."
+msgstr "Le animazioni meteo predefinite usano i tre LED visivi; quelle personalizzate usano solo il LED selezionato."
+
+msgid "Default animation"
+msgstr "Animazione predefinita"
+
+msgid "Three LEDs"
+msgstr "Tre LED"
+
+msgid "Uses the three visual LEDs when enabled."
+msgstr "Usa i tre LED visivi quando è attivata."

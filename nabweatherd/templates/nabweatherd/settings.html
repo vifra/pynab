@@ -65,6 +65,92 @@
         </div>
       </div>
 
+      {% if animation_error %}
+      <div class="alert alert-warning">
+        {% trans "Invalid animation settings for:" %} {{ animation_error }}
+      </div>
+      {% endif %}
+
+      <hr>
+      <button class="btn btn-outline-secondary btn-sm mb-3" type="button" data-toggle="collapse" data-target="#weatherLedUsage" aria-expanded="false" aria-controls="weatherLedUsage">
+        {% trans "LED usage summary" %}
+      </button>
+      <div class="collapse" id="weatherLedUsage">
+        <div class="table-responsive">
+          <table class="table table-sm table-bordered mb-3">
+            <thead>
+              <tr>
+                <th>{% trans "LED" %}</th>
+                <th>{% trans "Configured uses" %}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for led in led_usage_summary %}
+              <tr>
+                <th scope="row">{{ led.label }}</th>
+                <td>
+                  {% if led.has_multiple %}
+                  <span class="badge badge-warning mb-1">{% trans "Alternating display" %}</span><br>
+                  {% endif %}
+                  {% for item in led.items %}
+                  <div>
+                    <strong>{{ item.label }}</strong>
+                    <span class="text-muted">- {{ item.detail }}</span>
+                  </div>
+                  {% endfor %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <p class="text-muted"><small>{% trans "Idle visual animations are played one after another; they are not merged LED by LED." %}</small></p>
+      </div>
+
+      <button class="btn btn-outline-primary btn-sm mb-3" type="button" data-toggle="collapse" data-target="#weatherAnimationEditor" aria-expanded="false" aria-controls="weatherAnimationEditor">
+        {% trans "Configure visual animations" %}
+      </button>
+      <div class="collapse" id="weatherAnimationEditor">
+        <p class="text-muted"><small>{% trans "Each weather state can use one LED with a color and a simple animation." %}</small></p>
+        {% for animation in weather_animation_fields %}
+        <div class="border rounded p-2 mb-3 weather-animation-row">
+          <div class="form-row align-items-end">
+            <div class="form-group col-md-3">
+              <label for="weatherAnimationMode{{ animation.key }}">{{ animation.label }}</label>
+              <select id="weatherAnimationMode{{ animation.key }}" name="animation_mode_{{ animation.key }}" class="form-control weather-animation-mode">
+                <option value="default"{% if not animation.custom %} selected{% endif %}>{% trans "Default" %}</option>
+                <option value="custom"{% if animation.custom %} selected{% endif %}>{% trans "Custom" %}</option>
+              </select>
+            </div>
+            <div class="form-group col-md-3 weather-animation-custom">
+              <label for="weatherAnimationLed{{ animation.key }}">{% trans "LED" %}</label>
+              <select id="weatherAnimationLed{{ animation.key }}" name="animation_led_{{ animation.key }}" class="form-control">
+                {% for choice in animation.led_choices %}
+                <option value="{{ choice.value }}"{% if animation.led == choice.value %} selected{% endif %}>{{ choice.label }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="form-group col-md-2 weather-animation-custom">
+              <label for="weatherAnimationColor{{ animation.key }}">{% trans "Color" %}</label>
+              <input id="weatherAnimationColor{{ animation.key }}" name="animation_color_{{ animation.key }}" type="color" class="form-control" value="{{ animation.color }}">
+            </div>
+            <div class="form-group col-md-2 weather-animation-custom">
+              <label for="weatherAnimationPattern{{ animation.key }}">{% trans "Animation" %}</label>
+              <select id="weatherAnimationPattern{{ animation.key }}" name="animation_pattern_{{ animation.key }}" class="form-control">
+                {% for choice in animation.pattern_choices %}
+                <option value="{{ choice.value }}"{% if animation.pattern == choice.value %} selected{% endif %}>{{ choice.label }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="form-group col-md-2 weather-animation-custom">
+              <label for="weatherAnimationTempo{{ animation.key }}">{% trans "Tempo" %}</label>
+              <input id="weatherAnimationTempo{{ animation.key }}" name="animation_tempo_{{ animation.key }}" type="number" min="1" max="500" class="form-control" value="{{ animation.tempo }}">
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
     </div>
     <div class="card-footer">
       <div class="row mb-2">
@@ -95,14 +181,23 @@
       resetBtn.removeClass('disabled');
     });
     form.find('.clockpicker').clockpicker();
-    form.find('input').on('change', function() {
+    function refreshAnimationRows() {
+      form.find('.weather-animation-row').each(function() {
+        var row = $(this);
+        row.find('.weather-animation-custom').toggle(row.find('.weather-animation-mode').val() == 'custom');
+      });
+    }
+
+    form.find('input').on('change keyup', function() {
       saveBtn.removeClass('disabled');
       resetBtn.removeClass('disabled');
     });
     form.find('select').on('change', function() {
       saveBtn.removeClass('disabled');
       resetBtn.removeClass('disabled');
+      refreshAnimationRows();
     });
+    refreshAnimationRows();
     form.on('submit', function() {
       var formdata = form.serialize();
       $.ajax({

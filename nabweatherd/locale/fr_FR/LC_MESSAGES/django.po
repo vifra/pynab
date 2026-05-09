@@ -52,6 +52,9 @@ msgstr "Neige"
 msgid "Rain alert"
 msgstr "Alerte pluie"
 
+msgid "Fog"
+msgstr "Brouillard"
+
 #: templates/nabweatherd/rfid-data.html:3
 msgid "Day"
 msgstr "Jour"
@@ -167,6 +170,99 @@ msgstr "Aucune"
 #: templates/nabweatherd/settings.html:61
 msgid "Forecast"
 msgstr "Prévision"
+
+msgid "Invalid animation settings for:"
+msgstr "Paramètres d'animation invalides pour :"
+
+msgid "Configure visual animations"
+msgstr "Configurer les animations visuelles"
+
+msgid "LED usage summary"
+msgstr "Récapitulatif d'utilisation des LEDs"
+
+msgid "Configured uses"
+msgstr "Usages configurés"
+
+msgid "Alternating display"
+msgstr "Affichage en alternance"
+
+msgid "Idle visual animations are played one after another; they are not merged LED by LED."
+msgstr "Les animations visuelles au repos sont jouées les unes après les autres ; elles ne sont pas fusionnées LED par LED."
+
+msgid "Each weather state can use one LED with a color and a simple animation."
+msgstr "Chaque état météo peut utiliser une seule LED avec une couleur et une animation simple."
+
+msgid "Default"
+msgstr "Par défaut"
+
+msgid "Custom"
+msgstr "Personnalisée"
+
+msgid "LED"
+msgstr "LED"
+
+msgid "Left"
+msgstr "Gauche"
+
+msgid "Left LED"
+msgstr "LED gauche"
+
+msgid "Center"
+msgstr "Centre"
+
+msgid "Center LED"
+msgstr "LED centre"
+
+msgid "Right"
+msgstr "Droite"
+
+msgid "Right LED"
+msgstr "LED droite"
+
+msgid "Bottom LED"
+msgstr "LED dessous"
+
+msgid "Network status"
+msgstr "État réseau"
+
+msgid "Native pulse color"
+msgstr "Couleur de respiration native"
+
+msgid "Weather"
+msgstr "Météo"
+
+msgid "Air quality"
+msgstr "Qualité de l'air"
+
+msgid "Default animation, three LEDs"
+msgstr "Animation par défaut, trois LEDs"
+
+msgid "Custom animation"
+msgstr "Animation personnalisée"
+
+msgid "Free"
+msgstr "Libre"
+
+msgid "No configured use"
+msgstr "Aucun usage configuré"
+
+msgid "Color"
+msgstr "Couleur"
+
+msgid "Animation"
+msgstr "Animation"
+
+msgid "Blink"
+msgstr "Clignotement"
+
+msgid "Breathe"
+msgstr "Respiration"
+
+msgid "Fixed"
+msgstr "Fixe"
+
+msgid "Tempo"
+msgstr "Tempo"
 
 #: templates/nabweatherd/settings.html:72
 msgid "Save"

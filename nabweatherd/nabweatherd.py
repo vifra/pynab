@@ -1,4 +1,5 @@
 import datetime
+import json
 import logging
 import random
 import sys
@@ -127,6 +128,16 @@ class NabWeatherd(NabInfoService):
         '{"left":"000000","center":"ffff00","right":"0000ff"},'
         '{"left":"ffff00","center":"0000ff","right":"000000"}]}'
     )
+
+    DEFAULT_ANIMATIONS = {
+        "sunny": SUNNY_INFO_ANIMATION,
+        "rain_alert": RAIN_ONE_HOUR,
+        "cloudy": CLOUDY_INFO_ANIMATION,
+        "foggy": FOGGY_INFO_ANIMATION,
+        "rainy": RAINY_INFO_ANIMATION,
+        "snowy": SNOWY_INFO_ANIMATION,
+        "stormy": STORMY_INFO_ANIMATION,
+    }
 
     # Météo France weather classes
     WEATHER_CLASSES = {
@@ -334,6 +345,7 @@ class NabWeatherd(NabInfoService):
                 config.weather_frequency,
                 config.next_performance_weather_vocal_date,
                 config.next_performance_weather_vocal_flag,
+                config.weather_animations,
             ),
         )
 
@@ -398,7 +410,8 @@ class NabWeatherd(NabInfoService):
             weather_frequency,
             next_performance_weather_vocal_date,
             next_performance_weather_vocal_flag,
-        ) = config_t
+            weather_animations,
+        ) = self.unpack_config(config_t)
 
         if location is None:
             return None
@@ -450,7 +463,40 @@ class NabWeatherd(NabInfoService):
             "today_forecast_max_temp": today_forecast_max_temp,
             "tomorrow_forecast_weather_class": tomorrow_forecast_weather_class,
             "tomorrow_forecast_max_temp": tomorrow_forecast_max_temp,
+            "weather_animations": weather_animations,
         }
+
+    def unpack_config(self, config_t):
+        if len(config_t) == 6:
+            return (*config_t, {})
+        return config_t
+
+    @classmethod
+    def default_animation_objects(cls):
+        return {
+            key: json.loads(animation)
+            for key, animation in cls.DEFAULT_ANIMATIONS.items()
+        }
+
+    @classmethod
+    def animation_for_key(cls, key, weather_animations=None):
+        weather_animations = weather_animations or {}
+        animation = weather_animations.get(key)
+        if animation is None:
+            return cls.DEFAULT_ANIMATIONS[key]
+        if not cls.is_valid_animation(animation):
+            logging.warning(f"Invalid configured weather animation: {key}")
+            return cls.DEFAULT_ANIMATIONS[key]
+        return json.dumps(animation, separators=(",", ":"))
+
+    @staticmethod
+    def is_valid_animation(animation):
+        return (
+            isinstance(animation, dict)
+            and isinstance(animation.get("tempo"), (int, float))
+            and isinstance(animation.get("colors"), list)
+            and len(animation.get("colors")) > 0
+        )
 
     def normalize_weather_class(self, weather_class):
         if weather_class in NabWeatherd.WEATHER_CLASSES:
@@ -471,10 +517,13 @@ class NabWeatherd(NabInfoService):
         ):
 
             if info_data["next_rain"] is True:
+                rain_animation = self.animation_for_key(
+                    "rain_alert", info_data.get("weather_animations")
+                )
                 packet = (
                     '{"type":"info",'
                     '"info_id":"nabweatherd_rain",'
-                    '"animation":' + self.RAIN_ONE_HOUR + "}\r\n"
+                    '"animation":' + rain_animation + "}\r\n"
                 )
             else:
                 packet = '{"type":"info",' '"info_id":"nabweatherd_rain"}\r\n'
@@ -493,7 +542,9 @@ class NabWeatherd(NabInfoService):
             (weather_class, info_animation) = NabWeatherd.WEATHER_CLASSES[
                 info_data["today_forecast_weather_class"]
             ]
-            return info_animation
+            return self.animation_for_key(
+                weather_class, info_data.get("weather_animations")
+            )
 
         if info_data["weather_animation_type"] == "nothing":
             # Return mais avant on supprime l'animation rain
@@ -510,7 +561,8 @@ class NabWeatherd(NabInfoService):
             weather_frequency,
             next_performance_weather_vocal_date,
             next_performance_weather_vocal_local,
-        ) = config_t
+            weather_animations,
+        ) = self.unpack_config(config_t)
         if location is None:
             logging.debug("No location (service is unconfigured)")
             packet = (

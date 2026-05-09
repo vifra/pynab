@@ -1,0 +1,80 @@
+{% extends 'nabweb/_base.html' %}
+{% load i18n %}
+
+{% block subtitle %}{% trans "LEDs" %}{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-7 mb-3">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="card-title mb-0">{% trans "LED usage summary" %}</h5>
+      </div>
+      <div class="card-body">
+        <p class="text-muted">
+          {% trans "Idle visual animations are played one after another; they are not merged LED by LED." %}
+        </p>
+        <div class="table-responsive">
+          <table class="table table-sm table-bordered">
+            <thead>
+              <tr>
+                <th>{% trans "LED" %}</th>
+                <th>{% trans "Configured uses" %}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for led in leds %}
+              <tr>
+                <th scope="row">{{ led.label }}</th>
+                <td>
+                  {% if led.has_multiple %}
+                  <span class="badge badge-warning mb-1">{% trans "Alternating display" %}</span>
+                  {% endif %}
+                  {% for usage in led.usages %}
+                  <div class="mb-1">
+                    <strong>{{ usage.module }}</strong>
+                    {% if usage.mode %}<span class="badge badge-light">{{ usage.mode }}</span>{% endif %}
+                    <div class="text-muted">{{ usage.detail }}</div>
+                  </div>
+                  {% endfor %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-5 mb-3">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="card-title mb-0">{% trans "Modules" %}</h5>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-sm">
+            <thead>
+              <tr>
+                <th>{% trans "Module" %}</th>
+                <th>{% trans "LEDs" %}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for module in modules %}
+              <tr>
+                <td>
+                  <strong>{{ module.module }}</strong>
+                  <div class="text-muted">{{ module.detail }}</div>
+                </td>
+                <td>{{ module.leds }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

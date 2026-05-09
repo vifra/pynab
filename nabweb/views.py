@@ -14,6 +14,7 @@ from django.core.cache import cache
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.utils import translation
+from django.utils.translation import gettext_lazy as _
 from django.utils.translation import to_language, to_locale
 from django.views.generic import View
 
@@ -152,6 +153,176 @@ class NabWebServicesView(BaseView):
         context = super().get_context()
         context["services"] = BaseView.get_services("services")
         return context
+
+
+class NabWebLedUsageView(BaseView):
+    LEDS = [
+        ("left", _("Left LED")),
+        ("center", _("Center LED")),
+        ("right", _("Right LED")),
+        ("bottom", _("Bottom LED")),
+    ]
+
+    def template_name(self):
+        return "nabweb/leds/index.html"
+
+    def get_context(self):
+        context = super().get_context()
+        usages = {key: [] for key, label in self.LEDS}
+        modules = []
+
+        self.add_native_usage(usages, modules)
+        self.add_weather_usage(usages, modules)
+        self.add_airquality_usage(usages, modules)
+
+        context["leds"] = [
+            {
+                "key": key,
+                "label": label,
+                "usages": usages[key],
+                "has_multiple": len(usages[key]) > 1,
+            }
+            for key, label in self.LEDS
+        ]
+        for led in context["leds"]:
+            if not led["usages"]:
+                led["usages"].append(
+                    {
+                        "module": _("Free"),
+                        "detail": _("No configured use"),
+                        "mode": "",
+                    }
+                )
+        context["modules"] = modules
+        return context
+
+    def add_native_usage(self, usages, modules):
+        item = {
+            "module": _("Rabbit"),
+            "detail": _("Network status pulse"),
+            "mode": _("Native"),
+        }
+        usages["bottom"].append(item)
+        modules.append(
+            {
+                "module": _("Rabbit"),
+                "leds": _("Bottom LED"),
+                "detail": _(
+                    "Fuchsia when everything is fine, orange without "
+                    "Internet, red without local network."
+                ),
+            }
+        )
+
+    def add_weather_usage(self, usages, modules):
+        try:
+            from nabweatherd.models import Config as WeatherConfig
+            from nabweatherd.views import WEATHER_ANIMATION_FIELDS
+        except Exception:
+            return
+
+        config = WeatherConfig.load()
+        animation_type = config.weather_animation_type
+        if animation_type == "nothing":
+            modules.append(
+                {
+                    "module": _("Weather"),
+                    "leds": _("None"),
+                    "detail": _("Visual animation disabled"),
+                }
+            )
+            return
+
+        configured = getattr(config, "weather_animations", None) or {}
+        weather_enabled = animation_type in ("weather_only", "weather_and_rain")
+        rain_enabled = animation_type in ("rain_only", "weather_and_rain")
+        added = []
+
+        for key, label in WEATHER_ANIMATION_FIELDS:
+            if key == "rain_alert" and not rain_enabled:
+                continue
+            if key != "rain_alert" and not weather_enabled:
+                continue
+            if key in configured:
+                led = self.first_active_led(configured[key]) or "center"
+                detail = _("%(name)s, custom animation") % {"name": label}
+                usages[led].append(
+                    {
+                        "module": _("Weather"),
+                        "detail": detail,
+                        "mode": _("Custom"),
+                    }
+                )
+                added.append(f"{label}: {self.led_label(led)}")
+            else:
+                detail = _("%(name)s, default animation") % {"name": label}
+                for led in ("left", "center", "right"):
+                    usages[led].append(
+                        {
+                            "module": _("Weather"),
+                            "detail": detail,
+                            "mode": _("Default, three LEDs"),
+                        }
+                    )
+                added.append(f"{label}: {_('Left + center + right')}")
+
+        modules.append(
+            {
+                "module": _("Weather"),
+                "leds": ", ".join(added) if added else _("None"),
+                "detail": _(
+                    "Default weather animations use the three visual LEDs; "
+                    "custom weather animations use the selected LED only."
+                ),
+            }
+        )
+
+    def add_airquality_usage(self, usages, modules):
+        try:
+            from nabairqualityd.models import Config as AirQualityConfig
+        except Exception:
+            return
+
+        config = AirQualityConfig.load()
+        if config.visual_airquality == "nothing":
+            modules.append(
+                {
+                    "module": _("Air quality"),
+                    "leds": _("None"),
+                    "detail": _("Visual animation disabled"),
+                }
+            )
+            return
+        for led in ("left", "center", "right"):
+            usages[led].append(
+                {
+                    "module": _("Air quality"),
+                    "detail": _("Default animation"),
+                    "mode": _("Three LEDs"),
+                }
+            )
+        modules.append(
+            {
+                "module": _("Air quality"),
+                "leds": _("Left + center + right"),
+                "detail": _("Uses the three visual LEDs when enabled."),
+            }
+        )
+
+    def first_active_led(self, animation):
+        for frame in animation.get("colors", []):
+            for led in ("left", "center", "right"):
+                if frame.get(led) and frame[led] != "000000":
+                    return led
+        return None
+
+    def led_label(self, led):
+        return {
+            "left": _("Left LED"),
+            "center": _("Center LED"),
+            "right": _("Right LED"),
+            "bottom": _("Bottom LED"),
+        }.get(led, led)
 
 
 class NabWebRfidView(BaseView):

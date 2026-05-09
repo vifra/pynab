@@ -912,3 +912,87 @@ msgstr "{} heures et 1 minute"
 #: templatetags/duration_filter.py:27
 msgid "{} hours and {} minutes"
 msgstr "{} heures et {} minutes"
+
+msgid "LED usage summary"
+msgstr "Récapitulatif d'utilisation des LEDs"
+
+msgid "Idle visual animations are played one after another; they are not merged LED by LED."
+msgstr "Les animations visuelles au repos sont jouées les unes après les autres ; elles ne sont pas fusionnées LED par LED."
+
+msgid "LED"
+msgstr "LED"
+
+msgid "Configured uses"
+msgstr "Usages configurés"
+
+msgid "Alternating display"
+msgstr "Affichage en alternance"
+
+msgid "Modules"
+msgstr "Modules"
+
+msgid "Module"
+msgstr "Module"
+
+msgid "Left LED"
+msgstr "LED gauche"
+
+msgid "Center LED"
+msgstr "LED centre"
+
+msgid "Right LED"
+msgstr "LED droite"
+
+msgid "Bottom LED"
+msgstr "LED dessous"
+
+msgid "Rabbit"
+msgstr "Lapin"
+
+msgid "Network status pulse"
+msgstr "Respiration d'état réseau"
+
+msgid "Native"
+msgstr "Natif"
+
+msgid "Fuchsia when everything is fine, orange without Internet, red without local network."
+msgstr "Fuchsia quand tout va bien, orange sans Internet, rouge sans réseau local."
+
+msgid "Free"
+msgstr "Libre"
+
+msgid "No configured use"
+msgstr "Aucun usage configuré"
+
+msgid "Weather"
+msgstr "Météo"
+
+msgid "Air quality"
+msgstr "Qualité de l'air"
+
+msgid "%(name)s, custom animation"
+msgstr "%(name)s, animation personnalisée"
+
+msgid "%(name)s, default animation"
+msgstr "%(name)s, animation par défaut"
+
+msgid "Custom"
+msgstr "Personnalisée"
+
+msgid "Default, three LEDs"
+msgstr "Par défaut, trois LEDs"
+
+msgid "Left + center + right"
+msgstr "Gauche + centre + droite"
+
+msgid "Default weather animations use the three visual LEDs; custom weather animations use the selected LED only."
+msgstr "Les animations météo par défaut utilisent les trois LEDs visuelles ; les animations météo personnalisées utilisent seulement la LED choisie."
+
+msgid "Default animation"
+msgstr "Animation par défaut"
+
+msgid "Three LEDs"
+msgstr "Trois LEDs"
+
+msgid "Uses the three visual LEDs when enabled."
+msgstr "Utilise les trois LEDs visuelles quand elle est activée."

@@ -23,6 +23,7 @@ from django.views.generic import TemplateView
 
 from .views import (
     NabWebHardwareTestView,
+    NabWebLedUsageView,
     NabWebRfidReadView,
     NabWebRfidView,
     NabWebRfidWriteView,
@@ -42,6 +43,7 @@ urlpatterns: List[Union[URLResolver, URLPattern]] = [
     path("planification/", include("nabplannerd.urls")),
     path("sound/", include("nabsound.urls")),
     path("services/", NabWebServicesView.as_view()),
+    path("leds/", NabWebLedUsageView.as_view()),
     path("rfid/", NabWebRfidView.as_view()),
     path("rfid/read", NabWebRfidReadView.as_view(), name="rfid.read"),
     path("rfid/write", NabWebRfidWriteView.as_view(), name="rfid.write"),

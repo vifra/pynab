@@ -30,6 +30,7 @@ class Config(singleton_model.SingletonModel):
     weather_animation_type = models.TextField(
         null=True, default="weather_and_rain"
     )
+    weather_animations = models.JSONField(default=dict, blank=True)
     weather_frequency = models.IntegerField(default=0)
 
     next_performance_weather_vocal_date = models.DateTimeField(null=True)

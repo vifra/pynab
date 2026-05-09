@@ -25,6 +25,21 @@ class TestNabWeatherd(unittest.TestCase):
         weather_class = service.normalize_weather_class("None")
         self.assertEqual(weather_class, None)
 
+    def test_custom_animation_for_key(self):
+        animation = NabWeatherd.animation_for_key(
+            "sunny",
+            {
+                "sunny": {
+                    "tempo": 12,
+                    "colors": [{"left": "ffffff", "center": "000000"}],
+                }
+            },
+        )
+        self.assertEqual(
+            json.loads(animation),
+            {"tempo": 12, "colors": [{"left": "ffffff", "center": "000000"}]},
+        )
+
 
 @pytest.mark.django_db(transaction=True)
 class TestNabWeatherdDB(unittest.TestCase):
