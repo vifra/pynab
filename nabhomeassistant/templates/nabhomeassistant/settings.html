@@ -1,0 +1,108 @@
+{% load i18n %}
+<div class="card" id="nabhomeassistant-settings">
+  <form action="/nabhomeassistant/settings">
+    {% csrf_token %}
+    <div class="card-header">
+      <h5 class="card-title">{% trans "Home Assistant" %}</h5>
+    </div>
+    <div class="card-body">
+      <p>{% trans "Configure la connexion a Home Assistant pour declencher des services quand Nabaztag voit un tag NFC." %}</p>
+      <p>{% trans "Cree un jeton d'acces longue duree dans Home Assistant, puis colle son adresse et le jeton ci-dessous." %}</p>
+
+      <div class="form-group row">
+        <label for="homeassistant_base_url" class="col-5 col-form-label">{% trans "Adresse Home Assistant" %}</label>
+        <div class="col-7">
+          <input id="homeassistant_base_url" name="base_url" type="url" class="form-control" value="{{ config.base_url }}" placeholder="http://homeassistant.local:8123">
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <label for="homeassistant_access_token" class="col-5 col-form-label">{% trans "Jeton d'acces" %}</label>
+        <div class="col-7">
+          <input id="homeassistant_access_token" name="access_token" type="password" class="form-control" value="{{ config.access_token }}">
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <div class="col-7 offset-5">
+          <button id="homeassistant-test-connection" type="button" class="btn btn-outline-secondary btn-sm">{% trans "Tester la connexion" %}</button>
+          <span id="homeassistant-test-status" class="small ml-2"></span>
+        </div>
+      </div>
+
+      <p>{% trans "Ensuite, va dans les tags NFC et choisis Home Assistant pour definir le service a lancer." %}</p>
+    </div>
+    <div class="card-footer">
+      <div class="row mb-2">
+        <div class="col-12">
+          <button type="submit" class="btn btn-primary disabled ml-2 float-right save-button">{% trans "Save" %}</button>
+          <button type="reset" class="btn btn-outline-primary disabled ml-2 float-right reset-button">{% trans "Reset" %}</button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+
+<script type="text/javascript">
+  $(function() {
+    var form = $('#nabhomeassistant-settings form');
+    var saveBtn = form.find('button.save-button');
+    var resetBtn = form.find('button.reset-button');
+    var url = form.attr('action');
+    var testStatus = $("#homeassistant-test-status");
+
+    function statusClass(status) {
+      return status == "ok" ? "text-success" : "text-danger";
+    }
+
+    function showStatus(element, status, message) {
+      element
+        .removeClass("text-muted text-success text-danger")
+        .addClass(statusClass(status))
+        .text(message);
+    }
+
+    form.find('input').on('change keyup', function() {
+      saveBtn.removeClass('disabled');
+      resetBtn.removeClass('disabled');
+    });
+    form.on('submit', function() {
+      var formdata = form.serialize();
+      $.ajax({
+        url: url,
+        method: "POST",
+        data: formdata,
+        success: function(data) {
+          $("#nabhomeassistant-settings").replaceWith(data);
+        }
+      });
+      return false;
+    });
+    resetBtn.on("click", function() {
+      $.get(url, function(data) {
+        $("#nabhomeassistant-settings").replaceWith(data);
+      });
+    });
+    $("#homeassistant-test-connection").on("click", function() {
+      testStatus
+        .removeClass("text-success text-danger")
+        .addClass("text-muted")
+        .text("Test en cours...");
+      $.ajax({
+        url: "/nabhomeassistant/test-connection",
+        method: "GET",
+        success: function(data) {
+          showStatus(testStatus, data.status, data.message);
+        },
+        error: function(xhr) {
+          var data = xhr.responseJSON || {};
+          showStatus(
+            testStatus,
+            "error",
+            data.message || "Test de connexion impossible."
+          );
+        }
+      });
+    });
+  });
+</script>

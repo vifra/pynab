@@ -1,0 +1,17 @@
+[Unit]
+Description=Nabaztag Home Assistant daemon
+After=nabd.service
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=root
+WorkingDirectory=/opt/pynab
+EnvironmentFile=/opt/pynab/nabhomeassistant/nabhomeassistant.conf
+ExecStart=/opt/pynab/venv/bin/python -m nabhomeassistant.nabhomeassistant
+PIDFile=/run/nabhomeassistant.pid
+
+[Install]
+WantedBy=multi-user.target

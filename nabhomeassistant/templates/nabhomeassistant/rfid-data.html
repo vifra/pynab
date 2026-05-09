@@ -1,0 +1,177 @@
+{% load i18n %}
+<!-- {% trans "Home Assistant" %} -->
+<p>{% trans "Quand Nabaztag voit ce tag NFC, il peut lire une valeur Home Assistant ou appeler un service." %}</p>
+
+<div class="form-group row">
+  <label for="homeassistant_action_type" class="col-6 col-form-label">{% trans "Action" %}</label>
+  <div class="col-6">
+    <select id="homeassistant_action_type" name="action_type" class="form-control">
+      <option value="read_state"{% if action_type == "read_state" %} selected{% endif %}>{% trans "Lire une entite" %}</option>
+      <option value="call_service"{% if action_type == "call_service" %} selected{% endif %}>{% trans "Appeler un service" %}</option>
+    </select>
+  </div>
+</div>
+
+<div class="form-group row">
+  <label for="homeassistant_service_path" class="col-6 col-form-label">{% trans "Service Home Assistant" %}</label>
+  <div class="col-6">
+    <input id="homeassistant_service_path" name="service_path" type="text" class="form-control" value="{{ service_path }}" placeholder="light.turn_on">
+    <input id="homeassistant_uid" name="homeassistant_uid" type="hidden" class="form-control" value="{{ homeassistant_uid }}">
+  </div>
+</div>
+
+<div class="form-group row">
+  <label for="homeassistant_entity_id" class="col-6 col-form-label">{% trans "Entite" %}</label>
+  <div class="col-6">
+    <div class="input-group input-group-sm">
+      <input id="homeassistant_entity_id" name="entity_id" type="text" class="form-control" value="{{ entity_id }}" placeholder="light.salon" list="homeassistant_entities_list">
+      <datalist id="homeassistant_entities_list"></datalist>
+      <div class="input-group-append">
+        <button id="homeassistant_load_entities" type="button" class="btn btn-outline-secondary">{% trans "Charger" %}</button>
+        <button id="homeassistant_preview_state" type="button" class="btn btn-outline-secondary">{% trans "Tester" %}</button>
+      </div>
+    </div>
+    <div id="homeassistant_entities_status" class="small text-muted mt-1"></div>
+    <div id="homeassistant_preview_status" class="small mt-1"></div>
+  </div>
+</div>
+
+<div class="form-group row homeassistant-speech-rule">
+  <label for="homeassistant_speech_regex" class="col-6 col-form-label">{% trans "Regexp du texte lu" %}</label>
+  <div class="col-6">
+    <input id="homeassistant_speech_regex" name="speech_regex" type="text" class="form-control form-control-sm" value="{{ speech_regex }}" placeholder="^SOLR Day Production vaut (.+) Wh$">
+  </div>
+</div>
+
+<div class="form-group row homeassistant-speech-rule">
+  <label for="homeassistant_speech_replacement" class="col-6 col-form-label">{% trans "Texte remplace" %}</label>
+  <div class="col-6">
+    <input id="homeassistant_speech_replacement" name="speech_replacement" type="text" class="form-control form-control-sm" value="{{ speech_replacement }}" placeholder="La production est de \1 Watt heure">
+    <div class="small text-muted mt-1">{% trans "Laisse vide pour garder le texte automatique. Utilise \\1, \\2... pour reprendre les groupes captures." %}</div>
+  </div>
+</div>
+
+<div class="form-group row">
+  <label for="homeassistant_service_data" class="col-6 col-form-label">{% trans "Donnees JSON" %}</label>
+  <div class="col-6">
+    <textarea id="homeassistant_service_data" name="service_data" class="form-control" rows="3" placeholder='{"brightness_pct": 60}'>{{ service_data }}</textarea>
+  </div>
+</div>
+
+<script type="text/javascript">
+  $(function() {
+    var entitiesLoaded = false;
+
+    function showHomeAssistantEntitiesStatus(status, message) {
+      $("#homeassistant_entities_status")
+        .removeClass("text-muted text-success text-danger")
+        .addClass(status == "error" ? "text-danger" : "text-muted")
+        .text(message);
+    }
+
+    function showHomeAssistantPreviewStatus(status, message) {
+      $("#homeassistant_preview_status")
+        .removeClass("text-muted text-success text-danger")
+        .addClass(status == "ok" ? "text-success" : "text-danger")
+        .text(message);
+    }
+
+    function loadHomeAssistantEntities() {
+      var button = $("#homeassistant_load_entities");
+      button.prop("disabled", true);
+      showHomeAssistantEntitiesStatus("loading", "Chargement des entites...");
+      $.ajax({
+        url: "/nabhomeassistant/entities",
+        method: "GET",
+        success: function(data) {
+          var list = $("#homeassistant_entities_list");
+          var entities = data.entities || [];
+          list.empty();
+          entities.forEach(function(entity) {
+            var label = entity.name;
+            var value = entity.state;
+            if (entity.unit) {
+              value += " " + entity.unit;
+            }
+            if (value) {
+              label += " - " + value;
+            }
+            list.append(
+              $("<option></option>")
+                .attr("value", entity.entity_id)
+                .attr("label", label)
+            );
+          });
+          entitiesLoaded = true;
+          showHomeAssistantEntitiesStatus(
+            "ok",
+            entities.length + " entites chargees."
+          );
+        },
+        error: function(xhr) {
+          var data = xhr.responseJSON || {};
+          showHomeAssistantEntitiesStatus(
+            "error",
+            data.message || "Impossible de charger les entites."
+          );
+        },
+        complete: function() {
+          button.prop("disabled", false);
+        }
+      });
+    }
+
+    function previewHomeAssistantState() {
+      var entityId = $("#homeassistant_entity_id").val();
+      if (!entityId) {
+        showHomeAssistantPreviewStatus(
+          "error",
+          "Choisis une entite Home Assistant."
+        );
+        return;
+      }
+      var button = $("#homeassistant_preview_state");
+      button.prop("disabled", true);
+      $("#homeassistant_preview_status")
+        .removeClass("text-success text-danger")
+        .addClass("text-muted")
+        .text("Lecture en cours...");
+      $.ajax({
+        url: "/nabhomeassistant/preview-state",
+        method: "GET",
+        data: {
+          entity_id: entityId,
+          speech_regex: $("#homeassistant_speech_regex").val(),
+          speech_replacement: $("#homeassistant_speech_replacement").val()
+        },
+        success: function(data) {
+          showHomeAssistantPreviewStatus("ok", data.spoken_text);
+        },
+        error: function(xhr) {
+          var data = xhr.responseJSON || {};
+          showHomeAssistantPreviewStatus(
+            "error",
+            data.message || "Impossible de lire cette entite."
+          );
+        },
+        complete: function() {
+          button.prop("disabled", false);
+        }
+      });
+    }
+
+    function updateHomeAssistantActionFields() {
+      var readState = $("#homeassistant_action_type").val() == "read_state";
+      $("#homeassistant_service_path").closest(".form-group").toggleClass("d-none", readState);
+      $("#homeassistant_service_data").closest(".form-group").toggleClass("d-none", readState);
+      $(".homeassistant-speech-rule").toggleClass("d-none", !readState);
+      if (readState && !entitiesLoaded) {
+        loadHomeAssistantEntities();
+      }
+    }
+    $("#homeassistant_action_type").on("change", updateHomeAssistantActionFields);
+    $("#homeassistant_load_entities").on("click", loadHomeAssistantEntities);
+    $("#homeassistant_preview_state").on("click", previewHomeAssistantState);
+    updateHomeAssistantActionFields();
+  });
+</script>

@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     "nabplannerd",
     "nabsound",
     "nabtts",
+    "nabhomeassistant",
     "nabweb",
     "nabiftttd",
     "nabradio",
