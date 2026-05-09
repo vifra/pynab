@@ -44,12 +44,8 @@
     <div class="form-group">
       <label>{% trans "Entite Home Assistant" %}</label>
       <div class="input-group">
-        <select name="homeassistant_entity_id" class="form-control planner-homeassistant-entity-select" data-current="{% if rule and rule.service == "nabhomeassistant" %}{{ rule.homeassistant_entity_id }}{% endif %}">
-          <option value="">{% trans "Choisir une entite" %}</option>
-          {% if rule and rule.service == "nabhomeassistant" and rule.homeassistant_entity_id %}
-          <option value="{{ rule.homeassistant_entity_id }}" selected>{{ rule.homeassistant_entity_id }}</option>
-          {% endif %}
-        </select>
+        <input name="homeassistant_entity_id" type="text" class="form-control" value="{% if rule and rule.service == "nabhomeassistant" %}{{ rule.homeassistant_entity_id }}{% endif %}" placeholder="sensor.solr_day_production" list="planner-homeassistant-entities-{% if rule %}{{ rule.id }}{% else %}new{% endif %}">
+        <datalist id="planner-homeassistant-entities-{% if rule %}{{ rule.id }}{% else %}new{% endif %}" class="planner-homeassistant-entities"></datalist>
         <div class="input-group-append">
           <button type="button" class="btn btn-outline-secondary planner-homeassistant-load-entities">{% trans "Charger" %}</button>
           <button type="button" class="btn btn-outline-secondary planner-homeassistant-preview">{% trans "Tester" %}</button>
