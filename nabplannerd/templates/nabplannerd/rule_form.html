@@ -3,6 +3,10 @@
   {% csrf_token %}
   <input name="color" type="hidden" class="planner-color-value" value="{% if rule %}{{ rule.display_color }}{% else %}#27865a{% endif %}">
   {% if rule %}<input type="hidden" name="rule_id" value="{{ rule.id }}">{% endif %}
+  <div class="form-group">
+    <label>{% trans "Titre" %}</label>
+    <input name="rule_name" type="text" class="form-control" value="{% if rule %}{{ rule.name }}{% endif %}" placeholder="{% trans "Nom affiche dans le calendrier" %}">
+  </div>
   <div class="form-row">
     <div class="form-group col-md-6">
       <label>{% trans "Service" %}</label>

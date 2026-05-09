@@ -119,7 +119,7 @@ class RuleRunView(View):
 def apply_rule_form(rule, post):
     rule.service = post.get("service", "")
     rule.action = post.get("action", "")
-    rule.name = service_name(rule.service)
+    rule.name = post.get("rule_name", "").strip() or service_name(rule.service)
     if rule.service == "nabtts":
         rule.action = tts_rfid_data.serialize_payload(
             post.get("tts_message", ""),
@@ -258,11 +258,13 @@ def build_timeline(rules, sleep_segments):
             segment = timeline_segment(rule)
             if segment is not None:
                 items.append(segment)
+        laid_out_items = layout_timeline_items(items)
         rows.append(
             {
                 "label": label,
                 "sleep_segments": sleep_segments[weekday],
-                "segments": layout_timeline_items(items),
+                "segments": laid_out_items,
+                "lane_count": timeline_lane_count(laid_out_items),
             }
         )
     return rows
@@ -285,6 +287,14 @@ def layout_timeline_items(items):
     for item in items:
         item["lane_count"] = lane_count
     return items
+
+
+def timeline_lane_count(items):
+    lane_count = 1
+    for item in items:
+        if item["kind"] == "segment":
+            lane_count = max(lane_count, item.get("lane_count", 1))
+    return lane_count
 
 
 def first_available_lane(lanes, start, end):

@@ -7,6 +7,26 @@
     overflow-x: auto;
     background: #fff;
   }
+  .planner-page {
+    width: calc(100vw - 2rem);
+    margin-left: calc(50% - 50vw + 1rem);
+  }
+  .planner-page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  .planner-layout {
+    display: grid;
+    grid-template-columns: minmax(720px, 1fr) 180px;
+    gap: 1rem;
+    align-items: start;
+  }
+  .planner-layout.legend-hidden {
+    grid-template-columns: minmax(720px, 1fr);
+  }
   .planner-timeline-card .card-header {
     background: #f8f9fa;
   }
@@ -30,12 +50,14 @@
   .planner-hours,
   .planner-lane {
     position: relative;
-    min-height: 62px;
     background-image: linear-gradient(to right, #e9ecef 1px, transparent 1px);
     background-size: calc(100% / 24) 100%;
   }
+  .planner-lane {
+    min-height: calc(42px + (20px * var(--segment-lanes, 1)));
+  }
   .planner-hours {
-    min-height: 30px;
+    min-height: 36px;
     color: #6c757d;
     font-size: .75rem;
     background-color: #f8f9fa;
@@ -47,12 +69,12 @@
   }
   .planner-segment {
     position: absolute;
-    top: calc(7px + (22px * var(--lane)));
-    height: 18px;
+    top: calc(34px + (20px * var(--lane)));
+    height: 16px;
     border-radius: .25rem;
     color: #fff;
     font-size: .78rem;
-    line-height: 18px;
+    line-height: 16px;
     padding: 0 .5rem;
     white-space: nowrap;
     overflow: hidden;
@@ -62,9 +84,9 @@
   }
   .planner-point {
     position: absolute;
-    top: 4px;
-    width: 18px;
-    height: 18px;
+    top: 6px;
+    width: 15px;
+    height: 15px;
     border: 3px solid #fff;
     border-radius: 50%;
     box-shadow: 0 0 0 1px rgba(0, 0, 0, .25);
@@ -74,7 +96,7 @@
   }
   .planner-point-label {
     position: absolute;
-    top: 24px;
+    top: 22px;
     transform: translateX(-50%);
     font-size: .68rem;
     color: #495057;
@@ -150,10 +172,112 @@
   .planner-service-disabled {
     background: #adb5bd;
   }
+  .planner-legend {
+    position: sticky;
+    top: 1rem;
+  }
+  .planner-legend .card-body {
+    padding: .75rem;
+  }
+  .planner-layout.legend-hidden .planner-legend {
+    display: none;
+  }
+  .planner-legend-item {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    margin-bottom: .5rem;
+    font-size: .85rem;
+  }
+  .planner-legend-item:last-child {
+    margin-bottom: 0;
+  }
+  .planner-legend-rule {
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+  .planner-legend-rule:hover span:last-child {
+    text-decoration: underline;
+  }
+  .planner-legend-swatch {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 1px solid rgba(0, 0, 0, .2);
+    flex: 0 0 auto;
+  }
+  .planner-legend-sleep {
+    border-radius: .2rem;
+    background: rgba(108, 117, 125, .18);
+  }
+  .planner-rule-popin {
+    position: fixed;
+    z-index: 1050;
+    inset: 0;
+    background: #fff;
+    overflow-y: auto;
+  }
+  .planner-rule-popin-header {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: #fff;
+    border-bottom: 1px solid #dee2e6;
+    padding: 1rem 1.25rem;
+  }
+  .planner-rule-popin-body {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 1.25rem;
+  }
+  .planner-rule-panel {
+    display: none;
+  }
+  .planner-rule-panel.active {
+    display: block;
+  }
+  .planner-rule-panel form.planner-rule {
+    max-width: 100%;
+  }
+  body.planner-popin-open {
+    overflow: hidden;
+  }
+  @media (max-width: 767.98px) {
+    .planner-page {
+      width: 100%;
+      margin-left: 0;
+    }
+    .planner-page-header {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+    .planner-layout {
+      display: block;
+    }
+    .planner-legend {
+      position: static;
+      margin-top: 1rem;
+    }
+    .planner-rule-popin-body {
+      padding: 1rem;
+    }
+  }
 </style>
 
-<div class="row">
-  <div class="col-xl-10 col-lg-7 mb-3">
+<div class="planner-page">
+  <div class="planner-page-header">
+    <h4 class="mb-0">{% trans "Planification" %}</h4>
+    <div>
+      <button type="button" class="btn btn-outline-secondary planner-toggle-legend">{% trans "Masquer la legende" %}</button>
+      <button type="button" class="btn btn-primary planner-open-new">{% trans "Nouvelle regle" %}</button>
+    </div>
+  </div>
+  <div class="planner-layout">
     <div class="card planner-timeline-card">
       <div class="card-header">
         <h5 class="card-title mb-0">{% trans "Vue hebdomadaire" %}</h5>
@@ -171,17 +295,17 @@
           {% for row in timeline %}
           <div class="planner-row">
             <div class="planner-day">{{ row.label }}</div>
-            <div class="planner-lane">
+            <div class="planner-lane" style="--segment-lanes: {{ row.lane_count }};">
               {% for sleep_segment in row.sleep_segments %}
               <span class="planner-sleep-segment" style="left: {{ sleep_segment.left }}%; width: {{ sleep_segment.width }}%;" title="{% trans "Lapin endormi" %}"></span>
               {% endfor %}
               {% for segment in row.segments %}
               {% if segment.kind == "points" %}
-                {% for point in segment.points %}
-                <span class="planner-point {{ segment.class }} planner-edit-trigger" data-rule-id="{{ segment.rule_id }}" style="left: {{ point.left }}%; background-color: {{ segment.color }};" title="{{ segment.service_name }} - {{ point.time }}"></span>
+              {% for point in segment.points %}
+                <span class="planner-point {{ segment.class }} planner-edit-trigger" data-rule-id="{{ segment.rule_id }}" style="left: {{ point.left }}%; background-color: {{ segment.color }};" title="{{ segment.service_name }} - {{ point.time }}" aria-label="{{ segment.service_name }} - {{ point.time }}"></span>
                 {% endfor %}
               {% else %}
-              <div class="planner-segment {{ segment.class }} planner-edit-trigger" data-rule-id="{{ segment.rule_id }}" style="left: {{ segment.left }}%; width: {{ segment.width }}%; background-color: {{ segment.color }}; color: {{ segment.text_color }}; --lane: {{ segment.lane }};" title="{{ segment.label }}">
+              <div class="planner-segment {{ segment.class }} planner-edit-trigger" data-rule-id="{{ segment.rule_id }}" style="left: {{ segment.left }}%; width: {{ segment.width }}%; background-color: {{ segment.color }}; color: {{ segment.text_color }}; --lane: {{ segment.lane }};" title="{{ segment.label }}" aria-label="{{ segment.label }}">
                 {{ segment.label }}
                 {% for marker in segment.markers %}
                 <span class="planner-marker" style="left: {{ marker }}%;"></span>
@@ -195,44 +319,60 @@
         </div>
       </div>
     </div>
-  </div>
-  <div class="col-xl-2 col-lg-5 mb-3">
-    <div class="card mb-3 planner-new-card">
+    <div class="card planner-legend">
       <div class="card-header">
-        <div class="d-flex align-items-center justify-content-between">
-          <h5 class="card-title planner-card-title mb-0">{% trans "Nouvelle regle" %}</h5>
-          <input type="color" class="planner-color-picker planner-color-small" value="#27865a" data-planner-form="planner-form-new" title="{% trans "Couleur" %}">
-        </div>
+        <h6 class="mb-0">{% trans "Legende" %}</h6>
       </div>
       <div class="card-body">
-        {% include "nabplannerd/rule_form.html" with rule=None %}
+        {% for rule in rules %}
+        <button type="button" class="planner-legend-item planner-legend-rule planner-edit-trigger" data-rule-id="{{ rule.id }}">
+          <span class="planner-legend-swatch" style="background-color: {{ rule.display_color }};"></span>
+          <span title="{{ rule.timeline_label }}">{{ rule.name }}</span>
+        </button>
+        {% empty %}
+        <div class="planner-legend-item text-muted">{% trans "Aucune regle" %}</div>
+        {% endfor %}
+        <div class="planner-legend-item"><span class="planner-legend-swatch planner-legend-sleep"></span><span>{% trans "Lapin endormi" %}</span></div>
       </div>
     </div>
-    <div class="alert alert-info planner-edit-empty">{% trans "Cliquez une plage ou une pastille dans la vue hebdomadaire pour la modifier." %}</div>
+  </div>
+</div>
+
+<div class="planner-rule-popin d-none" role="dialog" aria-modal="true">
+  <div class="planner-rule-popin-header">
+    <div class="d-flex align-items-center justify-content-between">
+      <h4 class="planner-popin-title mb-0">{% trans "Regle de planification" %}</h4>
+      <button type="button" class="btn btn-outline-secondary planner-close-popin">{% trans "Fermer" %}</button>
+    </div>
+  </div>
+  <div class="planner-rule-popin-body">
+    <div class="planner-rule-panel planner-new-card" data-panel="new">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <h5 class="planner-card-title mb-0">{% trans "Nouvelle regle" %}</h5>
+        <input type="color" class="planner-color-picker planner-color-small" value="#27865a" data-planner-form="planner-form-new" title="{% trans "Couleur" %}">
+      </div>
+      {% include "nabplannerd/rule_form.html" with rule=None %}
+    </div>
     {% for rule in rules %}
-    <div class="card mb-2 planner-edit-card d-none" data-rule-id="{{ rule.id }}">
-      <div class="card-header">
-        <div class="d-flex align-items-center justify-content-between">
-          <h5 class="card-title planner-card-title mb-0"><span class="planner-color-chip" style="background-color: {{ rule.display_color }};"></span> {{ rule.name }}</h5>
-          <div class="planner-header-actions">
-            <input type="color" class="planner-color-picker planner-color-small" value="{{ rule.display_color }}" data-planner-form="planner-form-{{ rule.id }}" title="{% trans "Couleur" %}"{% if rule.color %} data-touched="true"{% endif %}>
-            <button type="button" class="btn btn-sm btn-outline-primary planner-new-button">{% trans "Nouvelle regle" %}</button>
-          </div>
+    <div class="planner-rule-panel planner-edit-card" data-rule-id="{{ rule.id }}">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <h5 class="planner-card-title mb-0"><span class="planner-color-chip" style="background-color: {{ rule.display_color }};"></span> {{ rule.name }}</h5>
+        <div class="planner-header-actions">
+          <input type="color" class="planner-color-picker planner-color-small" value="{{ rule.display_color }}" data-planner-form="planner-form-{{ rule.id }}" title="{% trans "Couleur" %}"{% if rule.color %} data-touched="true"{% endif %}>
+          <button type="button" class="btn btn-sm btn-outline-primary planner-new-button">{% trans "Nouvelle regle" %}</button>
         </div>
       </div>
-      <div class="card-body">
-        {% include "nabplannerd/rule_form.html" with rule=rule %}
-      </div>
-      <div class="card-footer">
+      {% include "nabplannerd/rule_form.html" with rule=rule %}
+      <div class="mt-3 d-flex justify-content-between">
         <form action="{% url 'nabplanner.delete' rule.id %}" method="post" class="d-inline">
           {% csrf_token %}
           <button type="submit" class="btn btn-outline-danger">{% trans "Supprimer" %}</button>
         </form>
-        <button type="button" class="btn btn-outline-primary float-right run-rule" data-url="{% url 'nabplanner.run' rule.id %}">{% trans "Declencher" %}</button>
+        <button type="button" class="btn btn-outline-primary run-rule" data-url="{% url 'nabplanner.run' rule.id %}">{% trans "Declencher" %}</button>
       </div>
     </div>
     {% empty %}
-    <div class="alert alert-info">{% trans "Aucune regle de planification." %}</div>
+    <div class="alert alert-info planner-no-rules">{% trans "Aucune regle de planification." %}</div>
     {% endfor %}
   </div>
 </div>
@@ -336,6 +476,17 @@ $(function() {
     } else {
       voice.val(selected);
     }
+  }
+  function openRulePanel(panel) {
+    $(".planner-rule-panel").removeClass("active");
+    panel.addClass("active");
+    $(".planner-rule-popin").removeClass("d-none");
+    $("body").addClass("planner-popin-open");
+  }
+  function closeRulePanel() {
+    $(".planner-rule-popin").addClass("d-none");
+    $(".planner-rule-panel").removeClass("active");
+    $("body").removeClass("planner-popin-open");
   }
   $("form.planner-rule").each(function(index, element) {
     var form = $(element);
@@ -448,15 +599,25 @@ $(function() {
   });
   $(".planner-edit-trigger").on("click", function() {
     var ruleId = $(this).data("rule-id").toString();
-    $(".planner-new-card").addClass("d-none");
-    $(".planner-edit-empty").addClass("d-none");
-    $(".planner-edit-card").addClass("d-none");
-    $(".planner-edit-card[data-rule-id='" + ruleId + "']").removeClass("d-none");
+    openRulePanel($(".planner-edit-card[data-rule-id='" + ruleId + "']"));
   });
   $(".planner-new-button").on("click", function() {
-    $(".planner-edit-card").addClass("d-none");
-    $(".planner-edit-empty").removeClass("d-none");
-    $(".planner-new-card").removeClass("d-none");
+    openRulePanel($(".planner-new-card"));
+  });
+  $(".planner-open-new").on("click", function() {
+    openRulePanel($(".planner-new-card"));
+  });
+  $(".planner-toggle-legend").on("click", function() {
+    var layout = $(".planner-layout");
+    var hidden = !layout.hasClass("legend-hidden");
+    layout.toggleClass("legend-hidden", hidden);
+    $(this).text(hidden ? "{% trans "Afficher la legende" %}" : "{% trans "Masquer la legende" %}");
+  });
+  $(".planner-close-popin").on("click", closeRulePanel);
+  $(document).on("keyup", function(event) {
+    if (event.key == "Escape") {
+      closeRulePanel();
+    }
   });
 });
 </script>
