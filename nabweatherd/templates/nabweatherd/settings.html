@@ -112,6 +112,45 @@
       </button>
       <div class="collapse" id="weatherAnimationEditor">
         <p class="text-muted"><small>{% trans "Each weather state can use one LED with a color and a simple animation." %}</small></p>
+        <style>
+          .weather-animation-color-preview {
+            display: inline-block;
+            width: 22px;
+            height: 22px;
+            border: 1px solid rgba(0, 0, 0, .25);
+            border-radius: .25rem;
+            vertical-align: middle;
+          }
+          .weather-animation-color-button {
+            display: inline-flex;
+            align-items: center;
+            gap: .35rem;
+          }
+          .weather-animation-palette-menu {
+            min-width: 230px;
+            max-width: 260px;
+          }
+          .weather-animation-palette-group + .weather-animation-palette-group {
+            margin-top: .35rem;
+          }
+          .weather-animation-palette {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+          }
+          .weather-animation-swatch {
+            width: 22px;
+            height: 22px;
+            border: 1px solid rgba(0, 0, 0, .25);
+            border-radius: .2rem;
+            padding: 0;
+            cursor: pointer;
+          }
+          .weather-animation-swatch.active {
+            outline: 2px solid #212529;
+            outline-offset: 1px;
+          }
+        </style>
         {% for animation in weather_animation_fields %}
         <div class="border rounded p-2 mb-3 weather-animation-row">
           <div class="form-row align-items-end">
@@ -132,7 +171,25 @@
             </div>
             <div class="form-group col-md-2 weather-animation-custom">
               <label for="weatherAnimationColor{{ animation.key }}">{% trans "Color" %}</label>
-              <input id="weatherAnimationColor{{ animation.key }}" name="animation_color_{{ animation.key }}" type="color" class="form-control" value="{{ animation.color }}">
+              <input id="weatherAnimationColor{{ animation.key }}" name="animation_color_{{ animation.key }}" type="hidden" class="weather-animation-color-value" value="{{ animation.color }}">
+              <div class="dropdown">
+                <button type="button" class="btn btn-outline-secondary dropdown-toggle weather-animation-color-button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  <span class="weather-animation-color-preview" style="background-color: {{ animation.color }};"></span>
+                  <span>{% trans "Color" %}</span>
+                </button>
+                <div class="dropdown-menu weather-animation-palette-menu p-2">
+                  {% for palette in led_color_palettes %}
+                  <div class="weather-animation-palette-group">
+                    <div class="small text-muted mb-1">{{ palette.name }}</div>
+                    <div class="weather-animation-palette">
+                      {% for color in palette.colors %}
+                      <button type="button" class="weather-animation-swatch{% if animation.color == color.value %} active{% endif %}" data-color="{{ color.value }}" style="background-color: {{ color.value }};" title="{{ color.label }}"></button>
+                      {% endfor %}
+                    </div>
+                  </div>
+                  {% endfor %}
+                </div>
+              </div>
             </div>
             <div class="form-group col-md-2 weather-animation-custom">
               <label for="weatherAnimationPattern{{ animation.key }}">{% trans "Animation" %}</label>
@@ -196,6 +253,16 @@
       saveBtn.removeClass('disabled');
       resetBtn.removeClass('disabled');
       refreshAnimationRows();
+    });
+    form.find(".weather-animation-swatch").on("click", function() {
+      var swatch = $(this);
+      var group = swatch.closest(".weather-animation-custom");
+      group.find(".weather-animation-swatch").removeClass("active");
+      swatch.addClass("active");
+      group.find(".weather-animation-color-value").val(swatch.data("color"));
+      group.find(".weather-animation-color-preview").css("background-color", swatch.data("color"));
+      saveBtn.removeClass('disabled');
+      resetBtn.removeClass('disabled');
     });
     refreshAnimationRows();
     form.on('submit', function() {

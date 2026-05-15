@@ -10,6 +10,10 @@ from meteofrance_api.client import MeteoFranceClient, Place
 from . import rfid_data
 from .models import Config, ScheduledMessage
 from .nabweatherd import NabWeatherd
+from nabweb.led_palette import (
+    choreography_color_palettes,
+    choreography_color_values,
+)
 
 
 WEATHER_ANIMATION_FIELDS = [
@@ -23,6 +27,7 @@ WEATHER_ANIMATION_FIELDS = [
 ]
 
 LED_CHOICES = [
+    {"value": "nose", "label": _("Nose")},
     {"value": "left", "label": _("Left")},
     {"value": "center", "label": _("Center")},
     {"value": "right", "label": _("Right")},
@@ -44,6 +49,7 @@ class SettingsView(TemplateView):
         context["weather_animation_fields"] = self.weather_animation_fields(
             context["config"]
         )
+        context["led_color_palettes"] = choreography_color_palettes()
         context["led_usage_summary"] = self.led_usage_summary(
             context["config"]
         )
@@ -60,6 +66,7 @@ class SettingsView(TemplateView):
 
     def led_usage_summary(self, config):
         usage = [
+            {"key": "nose", "label": _("Nose LED"), "items": []},
             {"key": "left", "label": _("Left LED"), "items": []},
             {"key": "center", "label": _("Center LED"), "items": []},
             {"key": "right", "label": _("Right LED"), "items": []},
@@ -206,6 +213,7 @@ class SettingsView(TemplateView):
     def weather_animation_fields(self, config):
         defaults = NabWeatherd.default_animation_objects()
         configured = config.weather_animations or {}
+        palette_values = choreography_color_values()
         fields = []
         for key, label in WEATHER_ANIMATION_FIELDS:
             animation = configured.get(key, defaults[key])
@@ -217,6 +225,7 @@ class SettingsView(TemplateView):
                     "custom": key in configured,
                     "led": simple["led"],
                     "color": simple["color"],
+                    "color_in_palette": simple["color"] in palette_values,
                     "tempo": simple["tempo"],
                     "pattern": simple["pattern"],
                     "led_choices": LED_CHOICES,
@@ -255,7 +264,7 @@ class SettingsView(TemplateView):
         color = "#0000ff"
         active_frames = []
         for frame in colors:
-            for candidate in ("left", "center", "right"):
+            for candidate in ("nose", "left", "center", "right", "bottom"):
                 value = frame.get(candidate)
                 if value and value != "000000":
                     led = candidate
@@ -275,7 +284,7 @@ class SettingsView(TemplateView):
         }
 
     def build_simple_animation(self, led, color, tempo, pattern):
-        if led not in ("left", "center", "right"):
+        if led not in ("nose", "left", "center", "right"):
             return None
         try:
             tempo = max(1, min(500, int(tempo)))
@@ -296,9 +305,11 @@ class SettingsView(TemplateView):
 
     def single_led_frame(self, led, color):
         return {
+            "nose": color if led == "nose" else "000000",
             "left": color if led == "left" else "000000",
             "center": color if led == "center" else "000000",
             "right": color if led == "right" else "000000",
+            "bottom": color if led == "bottom" else "000000",
         }
 
     def normalize_color(self, color):

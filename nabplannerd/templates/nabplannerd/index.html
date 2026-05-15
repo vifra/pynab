@@ -123,13 +123,45 @@
     margin-left: .5rem;
   }
   .planner-color-small {
-    width: 32px;
-    height: 32px;
-    padding: 2px;
-    border: 1px solid #ced4da;
+    display: none;
+  }
+  .planner-color-button {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    padding: .2rem .45rem;
+  }
+  .planner-color-preview {
+    display: inline-block;
+    width: 22px;
+    height: 22px;
+    border: 1px solid rgba(0, 0, 0, .25);
     border-radius: .25rem;
-    background: #fff;
     flex: 0 0 auto;
+  }
+  .planner-palette-menu {
+    min-width: 230px;
+    max-width: 260px;
+  }
+  .planner-palette-group + .planner-palette-group {
+    margin-top: .35rem;
+  }
+  .planner-palette {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .planner-palette-swatch {
+    width: 22px;
+    height: 22px;
+    border: 1px solid rgba(0, 0, 0, .3);
+    border-radius: .2rem;
+    padding: 0;
+    cursor: pointer;
+  }
+  .planner-palette-swatch.active {
+    outline: 2px solid #212529;
+    outline-offset: 1px;
   }
   .planner-sleep-segment {
     position: absolute;
@@ -349,7 +381,27 @@
     <div class="planner-rule-panel planner-new-card" data-panel="new">
       <div class="d-flex align-items-center justify-content-between mb-3">
         <h5 class="planner-card-title mb-0">{% trans "Nouvelle regle" %}</h5>
-        <input type="color" class="planner-color-picker planner-color-small" value="#27865a" data-planner-form="planner-form-new" title="{% trans "Couleur" %}">
+        <div class="planner-header-actions">
+          <input type="hidden" class="planner-color-picker" value="#27865a" data-planner-form="planner-form-new">
+          <div class="dropdown">
+            <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle planner-color-button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="{% trans "Couleur" %}">
+              <span class="planner-color-preview" data-planner-form="planner-form-new" style="background-color: #27865a;"></span>
+              <span>{% trans "Couleur" %}</span>
+            </button>
+            <div class="dropdown-menu dropdown-menu-right planner-palette-menu p-2">
+              {% for palette in led_color_palettes %}
+              <div class="planner-palette-group">
+                <div class="small text-muted mb-1">{{ palette.name }}</div>
+                <div class="planner-palette" data-planner-form="planner-form-new">
+                  {% for color in palette.colors %}
+                  <button type="button" class="planner-palette-swatch{% if color.value == "#27865a" %} active{% endif %}" data-color="{{ color.value }}" style="background-color: {{ color.value }};" title="{{ color.label }}"></button>
+                  {% endfor %}
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
       </div>
       {% include "nabplannerd/rule_form.html" with rule=None %}
     </div>
@@ -358,7 +410,25 @@
       <div class="d-flex align-items-center justify-content-between mb-3">
         <h5 class="planner-card-title mb-0"><span class="planner-color-chip" style="background-color: {{ rule.display_color }};"></span> {{ rule.name }}</h5>
         <div class="planner-header-actions">
-          <input type="color" class="planner-color-picker planner-color-small" value="{{ rule.display_color }}" data-planner-form="planner-form-{{ rule.id }}" title="{% trans "Couleur" %}"{% if rule.color %} data-touched="true"{% endif %}>
+          <input type="hidden" class="planner-color-picker" value="{{ rule.display_color }}" data-planner-form="planner-form-{{ rule.id }}"{% if rule.color %} data-touched="true"{% endif %}>
+          <div class="dropdown">
+            <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle planner-color-button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="{% trans "Couleur" %}">
+              <span class="planner-color-preview" data-planner-form="planner-form-{{ rule.id }}" style="background-color: {{ rule.display_color }};"></span>
+              <span>{% trans "Couleur" %}</span>
+            </button>
+            <div class="dropdown-menu dropdown-menu-right planner-palette-menu p-2">
+              {% for palette in led_color_palettes %}
+              <div class="planner-palette-group">
+                <div class="small text-muted mb-1">{{ palette.name }}</div>
+                <div class="planner-palette" data-planner-form="planner-form-{{ rule.id }}">
+                  {% for color in palette.colors %}
+                  <button type="button" class="planner-palette-swatch{% if color.value == rule.display_color %} active{% endif %}" data-color="{{ color.value }}" style="background-color: {{ color.value }};" title="{{ color.label }}"></button>
+                  {% endfor %}
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
           <button type="button" class="btn btn-sm btn-outline-primary planner-new-button">{% trans "Nouvelle regle" %}</button>
         </div>
       </div>
@@ -395,9 +465,19 @@ $(function() {
   function formColorPicker(form) {
     return $(".planner-color-picker[data-planner-form='" + form.attr("id") + "']");
   }
+  function formPalette(form) {
+    return $(".planner-palette[data-planner-form='" + form.attr("id") + "']");
+  }
+  function formColorPreview(form) {
+    return $(".planner-color-preview[data-planner-form='" + form.attr("id") + "']");
+  }
   function setFormColor(form, value) {
     formColorInput(form).val(value);
-    formColorPicker(form).val(value);
+    var picker = formColorPicker(form);
+    picker.val(value);
+    formPalette(form).find(".planner-palette-swatch").removeClass("active");
+    formPalette(form).find(".planner-palette-swatch[data-color='" + value + "']").first().addClass("active");
+    formColorPreview(form).css("background-color", value);
   }
   function syncServiceDefaults(form) {
     var service = form.find("select[name='service']").val();
@@ -498,9 +578,10 @@ $(function() {
     form.find("select[name='tts_provider']").on("change", function() {
       syncTtsVoiceOptions(form);
     });
-    formColorPicker(form).on("change", function() {
-      $(this).data("touched", true);
-      formColorInput(form).val($(this).val());
+    formPalette(form).find(".planner-palette-swatch").on("click", function() {
+      var value = $(this).data("color");
+      formColorPicker(form).data("touched", true);
+      setFormColor(form, value);
     });
     form.find("select[name='action']").on("change", function() {
       if ($(this).val() == "active_window") {

@@ -201,6 +201,12 @@ msgstr "Personnalisée"
 msgid "LED"
 msgstr "LED"
 
+msgid "Nose"
+msgstr "Nez"
+
+msgid "Nose LED"
+msgstr "LED nez"
+
 msgid "Left"
 msgstr "Gauche"
 
@@ -218,6 +224,9 @@ msgstr "Droite"
 
 msgid "Right LED"
 msgstr "LED droite"
+
+msgid "Bottom"
+msgstr "Dessous"
 
 msgid "Bottom LED"
 msgstr "LED dessous"

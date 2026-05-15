@@ -27,6 +27,7 @@ from nabtts.tts import (
     STYLE_CHOICES,
     VOICE_CHOICES,
 )
+from nabweb.led_palette import choreography_color_palettes
 
 
 WEEKDAYS = [
@@ -80,6 +81,7 @@ class PlannerView(View):
                 value for value, label in GOOGLE_VOICE_CHOICES
             ],
             "style_choices": STYLE_CHOICES,
+            "led_color_palettes": choreography_color_palettes(),
             "weekdays": WEEKDAYS,
             "timeline_hours": timeline_hours(),
             "timeline": build_timeline(rules, sleep_segments),

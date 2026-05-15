@@ -234,6 +234,48 @@ msgstr "Moduli"
 msgid "Module"
 msgstr "Modulo"
 
+msgid "Nose LED"
+msgstr "LED naso"
+
+msgid "Network status LED"
+msgstr "LED stato rete"
+
+msgid "LED color test"
+msgstr "Test colori LED"
+
+msgid "Try temporary colors and tempos on the nose, left, center and right LEDs. Nothing is saved."
+msgstr "Prova colori e tempi temporanei su naso, LED sinistro, centrale e destro. Non viene salvato nulla."
+
+msgid "Turn off test"
+msgstr "Spegni test"
+
+msgid "Test"
+msgstr "Test"
+
+msgid "Sending test..."
+msgstr "Invio test..."
+
+msgid "Test turned off."
+msgstr "Test spento."
+
+msgid "Test sent."
+msgstr "Test inviato."
+
+msgid "The bottom LED keeps showing the rabbit network status. This setting changes the pulse color used when everything is fine."
+msgstr "Il LED inferiore continua a mostrare lo stato della rete del coniglio. Questa impostazione cambia il colore della pulsazione quando tutto va bene."
+
+msgid "All fine color"
+msgstr "Colore quando tutto va bene"
+
+msgid "Orange still means no Internet access; red still means no local network."
+msgstr "Arancione indica ancora assenza di accesso Internet; rosso indica ancora assenza di rete locale."
+
+msgid "All fine: %(color)s"
+msgstr "Tutto bene: %(color)s"
+
+msgid "%(color)s when everything is fine, orange without Internet, red without local network."
+msgstr "%(color)s quando tutto va bene, arancione senza Internet, rosso senza rete locale."
+
 msgid "Left LED"
 msgstr "LED sinistro"
 

@@ -1,0 +1,151 @@
+{% load i18n %}
+<div class="card" id="nabledtest-settings">
+  <form action="/nabledtest/settings">
+    {% csrf_token %}
+    <div class="card-header">
+      <h5 class="card-title">{% trans "LED color test" %}</h5>
+    </div>
+    <div class="card-body">
+      <style>
+        #nabledtest-settings .led-test-grid {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: .75rem;
+        }
+        #nabledtest-settings .led-test-row {
+          padding: .65rem;
+          border: 1px solid #dee2e6;
+          border-radius: .35rem;
+          background: #fff;
+        }
+        #nabledtest-settings .led-test-color-preview {
+          display: inline-block;
+          width: 22px;
+          height: 22px;
+          border: 1px solid rgba(0, 0, 0, .25);
+          border-radius: .25rem;
+          vertical-align: middle;
+        }
+        #nabledtest-settings .led-test-color-button {
+          display: inline-flex;
+          align-items: center;
+          gap: .35rem;
+        }
+        #nabledtest-settings .led-test-palette-menu {
+          min-width: 230px;
+          max-width: 260px;
+        }
+        #nabledtest-settings .led-test-palette-group + .led-test-palette-group {
+          margin-top: .35rem;
+        }
+        #nabledtest-settings .led-test-palette {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 4px;
+        }
+        #nabledtest-settings .led-test-swatch {
+          width: 22px;
+          height: 22px;
+          border: 1px solid rgba(0, 0, 0, .25);
+          border-radius: .2rem;
+          padding: 0;
+          cursor: pointer;
+        }
+        #nabledtest-settings .led-test-swatch.active {
+          outline: 2px solid #212529;
+          outline-offset: 1px;
+        }
+        @media (max-width: 767.98px) {
+          #nabledtest-settings .led-test-grid {
+            grid-template-columns: 1fr;
+          }
+        }
+      </style>
+      <p class="text-muted">
+        <small>{% trans "Try temporary colors and tempos on the nose, left, center and right LEDs. Nothing is saved." %}</small>
+      </p>
+      <div class="led-test-grid mb-3">
+        {% for led in leds %}
+        <div class="led-test-row">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <strong>{{ led.label }}</strong>
+            <input id="ledTestColor{{ led.key }}" name="color_{{ led.key }}" type="hidden" class="led-test-color-value" value="{{ led.default }}">
+            <div class="dropdown">
+              <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle led-test-color-button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <span class="led-test-color-preview" style="background-color: {{ led.default }};"></span>
+                <span>{% trans "Color" %}</span>
+              </button>
+              <div class="dropdown-menu led-test-palette-menu p-2">
+                {% for palette in led_color_palettes %}
+                <div class="led-test-palette-group">
+                  <div class="small text-muted mb-1">{{ palette.name }}</div>
+                  <div class="led-test-palette">
+                    {% for color in palette.colors %}
+                    <button type="button" class="led-test-swatch{% if led.default == color.value %} active{% endif %}" data-color="{{ color.value }}" style="background-color: {{ color.value }};" title="{{ color.label }}"></button>
+                    {% endfor %}
+                  </div>
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+          <label class="small text-muted mb-1" for="ledTestTempo{{ led.key }}">{% trans "Tempo" %}</label>
+          <input id="ledTestTempo{{ led.key }}" name="tempo_{{ led.key }}" type="number" min="1" max="500" class="form-control form-control-sm" value="{{ led.tempo }}">
+        </div>
+        {% endfor %}
+      </div>
+      <div class="led-test-status small text-muted"></div>
+    </div>
+    <div class="card-footer">
+      <button type="button" class="btn btn-outline-secondary ml-2 float-right led-test-clear">{% trans "Turn off test" %}</button>
+      <button type="submit" class="btn btn-primary ml-2 float-right">{% trans "Test" %}</button>
+    </div>
+  </form>
+</div>
+
+<script type="text/javascript">
+  $(function() {
+    var form = $("#nabledtest-settings form");
+    var status = form.find(".led-test-status");
+    var url = form.attr("action");
+
+    form.find(".led-test-swatch").on("click", function() {
+      var swatch = $(this);
+      var row = swatch.closest(".led-test-row");
+      var color = swatch.data("color");
+      row.find(".led-test-swatch").removeClass("active");
+      swatch.addClass("active");
+      row.find(".led-test-color-value").val(color);
+      row.find(".led-test-color-preview").css("background-color", color);
+    });
+
+    function send(action) {
+      var data = form.serializeArray();
+      data.push({name: "action", value: action});
+      status.removeClass("text-danger text-success").addClass("text-muted").text("{% trans "Sending test..." %}");
+      $.ajax({
+        url: url,
+        method: "POST",
+        data: $.param(data),
+        success: function(data) {
+          if (data.status == "ok") {
+            status.removeClass("text-danger text-muted").addClass("text-success").text(action == "clear" ? "{% trans "Test turned off." %}" : "{% trans "Test sent." %}");
+          } else {
+            status.removeClass("text-success text-muted").addClass("text-danger").text(data.message || "{% trans "Unknown server error" %}");
+          }
+        },
+        error: function() {
+          status.removeClass("text-success text-muted").addClass("text-danger").text("{% trans "Unknown server error" %}");
+        }
+      });
+    }
+
+    form.on("submit", function() {
+      send("test");
+      return false;
+    });
+    form.find(".led-test-clear").on("click", function() {
+      send("clear");
+    });
+  });
+</script>

@@ -159,7 +159,7 @@ class NabIO(object, metaclass=abc.ABCMeta):
         Run the animation in loop for the complete info duration (15 seconds)
         or until condvar is notified
 
-        If 'left'/'center'/'right' slots are absent, the light is off.
+        If a LED slot is absent, the light is off.
         Return true if condvar was notified
         """
         animation = [NabIO._convert_info_color(color) for color in colors]
@@ -181,7 +181,7 @@ class NabIO(object, metaclass=abc.ABCMeta):
         return notified
 
     def clear_info(self):
-        for led in (Led.LEFT, Led.CENTER, Led.RIGHT):
+        for led in (Led.NOSE, Led.LEFT, Led.CENTER, Led.RIGHT):
             self.leds.set1(led, 0, 0, 0)
 
     @staticmethod
@@ -197,13 +197,14 @@ class NabIO(object, metaclass=abc.ABCMeta):
     def _convert_info_color(color):
         animation = []
         for led_ix, led in [
+            (Led.NOSE, "nose"),
             (Led.LEFT, "left"),
             (Led.CENTER, "center"),
             (Led.RIGHT, "right"),
         ]:
             values = []
-            if color[led]:
-                int_value = int(color[led], 16)
+            if color.get(led):
+                int_value = int(color.get(led), 16)
                 values.append((int_value >> 16) & 0xFF)  # r
                 values.append((int_value >> 8) & 0xFF)  # g
                 values.append(int_value & 0xFF)  # b

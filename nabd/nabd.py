@@ -145,6 +145,7 @@ class Nabd:
         """
         Reload configuration.
         """
+        network_ok_color = await self.network_ok_color()
         if self.nabio.has_sound_input():
             from . import i18n
             from .asr import ASR
@@ -168,7 +169,7 @@ class Nabd:
                 self.nlu = NLU(self._nlu_locale)
                 Nabd.leds_boot(self.nabio, 4)
             self.nabio.set_leds(None, None, None, None, None)
-        self.nabio.pulse(Led.BOTTOM, (255, 0, 255))  # Fuchsia
+        self.nabio.pulse(Led.BOTTOM, network_ok_color)
 
     async def _do_transition_to_idle(self):
         """
@@ -176,9 +177,10 @@ class Nabd:
         Lock is acquired.
         Thread: service or idle_worker_loop
         """
+        network_ok_color = await self.network_ok_color()
         left, right = self.ears["left"], self.ears["right"]
-        await self.nabio.move_ears_with_leds((255, 0, 255), left, right)
-        self.nabio.pulse(Led.BOTTOM, (255, 0, 255))  # Fuchsia
+        await self.nabio.move_ears_with_leds(network_ok_color, left, right)
+        self.nabio.pulse(Led.BOTTOM, network_ok_color)
         if network.ip_address(self.nabio.network_interface()) is None:
             # not even a local network connection: real bad
             logging.error("no network connection")
@@ -187,6 +189,28 @@ class Nabd:
             # local network connection, but no Internet access: not so good
             logging.warning("no Internet access")
             self.nabio.pulse(Led.BOTTOM, (255, 165, 0))  # Orange
+
+    async def network_ok_color(self):
+        try:
+            from nabnetworkled.models import Config as NetworkLedConfig
+
+            config = await NetworkLedConfig.load_async()
+            return self.hex_color_to_rgb(config.ok_color, (255, 0, 255))
+        except Exception:
+            return (255, 0, 255)
+
+    def hex_color_to_rgb(self, color, default):
+        color = (color or "").strip().lstrip("#")
+        if len(color) != 6:
+            return default
+        try:
+            return (
+                int(color[0:2], 16),
+                int(color[2:4], 16),
+                int(color[4:6], 16),
+            )
+        except ValueError:
+            return default
 
     async def sleep_setup(self):
         self.nabio.set_leds(None, None, None, None, None)
@@ -700,7 +724,10 @@ class Nabd:
             )
         else:
             if packet["service"] == "nabd":
-                if "slot" in packet and packet["slot"] == "locale":
+                if "slot" in packet and packet["slot"] in (
+                    "locale",
+                    "network_led",
+                ):
                     await self.reload_config()
                     self.write_response_packet(packet, STATUS_OK, writer)
 

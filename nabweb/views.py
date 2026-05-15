@@ -157,6 +157,7 @@ class NabWebServicesView(BaseView):
 
 class NabWebLedUsageView(BaseView):
     LEDS = [
+        ("nose", _("Nose LED")),
         ("left", _("Left LED")),
         ("center", _("Center LED")),
         ("right", _("Right LED")),
@@ -197,10 +198,17 @@ class NabWebLedUsageView(BaseView):
         return context
 
     def add_native_usage(self, usages, modules):
+        ok_color = "#ff00ff"
+        try:
+            from nabnetworkled.models import Config as NetworkLedConfig
+
+            ok_color = NetworkLedConfig.load().ok_color
+        except Exception:
+            pass
         item = {
             "module": _("Rabbit"),
             "detail": _("Network status pulse"),
-            "mode": _("Native"),
+            "mode": _("All fine: %(color)s") % {"color": ok_color},
         }
         usages["bottom"].append(item)
         modules.append(
@@ -208,9 +216,10 @@ class NabWebLedUsageView(BaseView):
                 "module": _("Rabbit"),
                 "leds": _("Bottom LED"),
                 "detail": _(
-                    "Fuchsia when everything is fine, orange without "
+                    "%(color)s when everything is fine, orange without "
                     "Internet, red without local network."
-                ),
+                )
+                % {"color": ok_color},
             }
         )
 
@@ -311,13 +320,14 @@ class NabWebLedUsageView(BaseView):
 
     def first_active_led(self, animation):
         for frame in animation.get("colors", []):
-            for led in ("left", "center", "right"):
+            for led in ("nose", "left", "center", "right", "bottom"):
                 if frame.get(led) and frame[led] != "000000":
                     return led
         return None
 
     def led_label(self, led):
         return {
+            "nose": _("Nose LED"),
             "left": _("Left LED"),
             "center": _("Center LED"),
             "right": _("Right LED"),
